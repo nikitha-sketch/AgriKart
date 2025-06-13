@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart - AgriKart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 text-gray-800">
+  <header class="bg-green-700 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Your Cart</h1>
+    <nav class="space-x-4">
+      <a href="index.html" class="hover:underline">Home</a>
+      <a href="checkout.html" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Proceed to Checkout</a>
+    </nav>
+  </header>
+
+  <main class="p-6">
+    <div id="cartItems" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </main>
+
+  <footer class="text-center p-4 text-sm bg-gray-100">
+    © 2025 AgriKart. All rights reserved.
+  </footer>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const container = document.getElementById("cartItems");
+
+    if (cart.length === 0) {
+      container.innerHTML = "<p class='text-center text-gray-500 col-span-full'>Your cart is empty.</p>";
+    } else {
+      cart.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-4 rounded shadow flex flex-col";
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" class="h-40 object-contain rounded mb-2">
+          <h2 class="font-bold text-lg">${item.name}</h2>
+          <p class="text-sm">Code: ${item.code}</p>
+          <p class="text-sm">${item.info}</p>
+          <p class="font-bold text-green-700 mt-auto">${item.price}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+    
+    
+  </script>
+</body>
+</html>

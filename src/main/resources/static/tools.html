@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tools - AgriKart</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+</style>
+</head>
+<body class="bg-green-50 text-gray-900">
+
+<header class="bg-green-700 text-white flex justify-between items-center p-4">
+  <h1 class="text-2xl font-bold">AgriKart - Tools</h1>
+  
+  <nav class="flex items-center space-x-6">
+    <a href="index.html" class="hover:underline">Home</a>
+
+    <div class="relative group">
+      <button class="hover:underline focus:outline-none">Products</button>
+      <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
+        <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
+        <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
+        <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
+        <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search Tools..."
+      class="p-2 rounded text-black"
+      oninput="filterTools()"
+    />
+    <a href="cart.html" class="hover:underline">Cart</a>
+    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+  </nav>
+</header>
+
+<section id="toolGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+  <!-- Cards inserted by JS -->
+</section>
+
+<div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
+
+<footer class="text-center py-4 bg-gray-100 text-sm">
+  © 2025 AgriKart. All rights reserved.
+</footer>
+
+<script>
+  const tools = [
+  {
+    code: "T001",
+    name: "Power Sprayer",
+    image: "assets/images/tools/powersprayer.jpeg",
+    use: "A power-operated sprayer used to spray pesticides or fertilizers over large areas efficiently.",
+    material: "high-density polyethylene (HDPE) or stainless steel",
+    price: "₹4500",
+    delivery: "Delivery within 5-7 days"
+  },
+  {
+    code: "T002",
+    name: "Khurpi Set",
+    image: "assets/images/tools/khurpi.jpeg",
+    use: "Used for digging, weeding and soil loosening.",
+    material: "Steel with plastic grip",
+    price: "₹250",
+    delivery: "3-5 days"
+  },
+  {
+    code: "T003",
+    name: "Hand Sprayer",
+    image: "assets/images/tools/handSprayer.jpeg",
+    use: "Spraying pesticides and fertilizers.",
+    material: "Plastic body",
+    price: "₹750",
+    delivery: "2-4 days"
+  },
+  {
+    code: "T004",
+    name: "Garden Hoe",
+    image: "assets/images/tools/gardenHoe.jpeg",
+    use: "Breaking soil and removing weeds.",
+    material: "Iron blade with wooden handle",
+    price: "₹420",
+    delivery: "3-6 days"
+  },
+  {
+    code: "T005",
+    name: "Sickle",
+    image: "assets/images/tools/sickle.jpeg",
+    use: "Harvesting crops like paddy and wheat.",
+    material: "Hardened steel",
+    price: "₹180",
+    delivery: "3-5 days"
+  },
+  {
+    code: "T006",
+    name: "Shovel",
+    image: "assets/images/tools/shovel.jpeg",
+    use: "Digging and lifting soil or compost.",
+    material: "Steel with D-grip handle",
+    price: "₹560",
+    delivery: "4-6 days"
+  },
+  {
+    code: "T007",
+    name: "Soil pH Tester",
+    image: "assets/images/tools/soilPH.jpeg",
+    use: "Measures pH level of soil.",
+    material: "Plastic and electronic components",
+    price: "₹900",
+    delivery: "2-5 days"
+  },
+  {
+    code: "T008",
+    name: "Pruning Shears",
+    image: "assets/images/tools/pruningShears.jpeg",
+    use: "Cutting small branches and plants.",
+    material: "Carbon steel blades",
+    price: "₹340",
+    delivery: "3-5 days"
+  },
+  {
+    code: "T009",
+    name: "Seed Sower",
+    image: "assets/images/tools/seedSower.jpeg",
+    use: "Sowing seeds evenly.",
+    material: "Plastic body with adjustable nozzle",
+    price: "₹380",
+    delivery: "2-4 days"
+  },
+  {
+    code: "T010",
+    name: "Wheel Hoe",
+    image: "assets/images/tools/wheelHoe.jpeg",
+    info: "Manual weeding tool with a wheel and blade, used for inter-row cultivation.",
+    use: "Efficient for weeding in vegetable beds.",
+    price: "₹1,200",
+    delivery: "3-5 days"
+  },
+  {
+    code: "T011",
+    name: "Seed Drill",
+    image: "assets/images/tools/seedDrill.jpeg",
+    info: "Implements that sow seeds at uniform depth and spacing.",
+    use: "Ensures even germination and reduces seed wastage.",
+    price: "₹3,500",
+    delivery: "5-7 days"
+  },
+  {
+    code: "T012",
+    name: "Power Tiller",
+    image: "assets/images/tools/powerTiller.jpeg",
+    info: "Multi-purpose machine used for ploughing, sowing, and spraying.",
+    use: "Ideal for small to medium-sized farms.",
+    price: "₹65,000",
+    delivery: "7-10 days"
+  },
+  {
+    code: "T013",
+    name: "Threshing Machine",
+    image: "assets/images/tools/ThreshingMachine.jpeg",
+    info: "Used for separating grains from harvested crops like paddy or wheat.",
+    use: "Reduces labor and increases post-harvest efficiency.",
+    price: "₹1,20,000",
+    delivery: "10-12 days"
+  },
+  {
+    code: "T014",
+    name: "Rotavator",
+    image: "assets/images/tools/Rotavor.jpeg",
+    info: "Used for soil preparation, breaking clods, and mixing residues.",
+    use: "Attached to tractors for large area preparation.",
+    price: "₹85,000",
+    delivery: "8-10 days"
+  },
+  {
+    code: "T015",
+    name: "Crop Harvester (Mini)",
+    image: "assets/images/tools/cropHarvester.jpeg",
+    info: "Compact machine used for harvesting paddy, wheat, and pulses.",
+    use: "Ideal for small farmers to harvest efficiently.",
+    price: "₹90,000",
+    delivery: "7-9 days"
+  },
+  {
+    code: "T016",
+    name: "Irrigation Sprinkler Kit",
+    image: "assets/images/tools/irrigationSprinkle.jpeg",
+    info: "Used for even watering across crops in dry areas.",
+    use: "Saves water and improves irrigation coverage.",
+    price: "₹3,000",
+    delivery: "3-5 days"
+  },
+  {
+    code: "T017",
+    name: "Fertilizer Broadcaster",
+    image: "assets/images/tools/fertilizerBroadcaster.jpeg",
+    info: "Device that spreads fertilizers uniformly across the field.",
+    use: "Saves time and improves nutrient distribution.",
+    price: "₹1,800",
+    delivery: "4-6 days"
+  },
+  {
+    code: "T018",
+    name: "Axe",
+    image: "assets/images/tools/axe.jpeg",
+    info: "Heavy-duty hand tool with a sharp metal blade for chopping and cutting.",
+    use: "Used for cutting wood, clearing bushes, and preparing land for farming.",
+    price: "₹450",
+    delivery: "3-5 days"
+  }
+];
+
+
+  const itemsPerPage = 4;
+  let currentPage = 1;
+  let filteredTools = tools;
+
+  function displayTools(page = 1) {
+  currentPage = page;
+  const toolGrid = document.getElementById('toolGrid');
+  toolGrid.innerHTML = '';
+  const start = (page - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = filteredTools.slice(start, end);
+
+  pageItems.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full';
+    card.innerHTML = `
+      <div class="flex flex-col h-full">
+        <img src="${t.image}" alt="${t.name}" class="w-full h-48 object-contain rounded">
+        <h3 class="text-lg font-semibold mt-2">${t.name}</h3>
+        <p class="text-sm text-gray-600">${t.info || ''}</p>
+        <p class="text-sm mt-1"><span class="font-semibold">Use:</span> ${t.use}</p>
+        <p class="text-sm"><span class="font-semibold">Price:</span> ${t.price}</p>
+        <p class="text-sm mb-2"><span class="font-semibold">Delivery:</span> ${t.delivery}</p>
+
+        <div class="mt-auto flex flex-col gap-2">
+          <button onclick='placeOrder(${JSON.stringify(t)})' class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Place Order</button>
+          <div class="flex gap-2">
+            <a href="tel:+919876543210" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-center flex-1">
+              📞 Call to Order
+            </a>
+            <a href="sms:+919876543210?body=I want to order: ${encodeURIComponent(t.name)}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center flex-1">
+              📩 SMS to Order
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+    toolGrid.appendChild(card);
+  });
+
+  setupPagination();
+}
+
+
+
+  function setupPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    const totalPages = Math.ceil(filteredTools.length / itemsPerPage);
+
+    for(let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = `px-4 py-2 rounded ${i === currentPage ? 'bg-green-700 text-white' : 'bg-green-300 text-green-900 hover:bg-green-500'}`;
+      btn.onclick = () => displayTools(i);
+      pagination.appendChild(btn);
+    }
+  }
+
+  function filterTools() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    filteredTools = tools.filter(t => 
+      t.name.toLowerCase().includes(query) || t.use.toLowerCase().includes(query)
+    );
+    displayTools(1);
+  }
+	function checkLoginBeforeOrder(productName) {
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (loggedIn === "true") {
+      alert(`Order placed for: ${productName}`);
+      // Redirect or open order page logic here
+    } else {
+      alert("Please login to place an order.");
+      window.location.href = "login.html";
+    }
+  }
+  function placeOrder(item) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push(item);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${item.name} added to cart!`);
+    window.location.href = "cart.html";
+  }
+function logout() {
+  localStorage.removeItem("loggedIn");
+  alert("You have been logged out.");
+  window.location.href = "login.html";
+}
+
+  // Initial load
+  displayTools();
+  
+  
+</script>
+
+
+
+</body>
+</html>

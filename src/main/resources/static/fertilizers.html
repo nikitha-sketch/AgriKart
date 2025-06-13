@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fertilizers - AgriKart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card {
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="bg-green-50">
+  <header class="bg-green-700 text-white flex justify-between items-center p-4">
+  <h1 class="text-2xl font-bold">AgriKart - Fertilizers</h1>
+  
+  <nav class="flex items-center space-x-6">
+    <a href="index.html" class="hover:underline">Home</a>
+
+    <div class="relative group">
+      <button class="hover:underline focus:outline-none">Products</button>
+      <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
+        <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
+        <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
+        <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
+        <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search fertilizers..."
+      class="p-2 rounded text-black"
+      oninput="renderFertilizers()"
+    />
+    <a href="cart.html" class="hover:underline">Cart</a>
+    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+  </nav>
+</header>
+
+<section id="fertilizerContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+  <!-- Cards inserted by JS -->
+</section>
+
+<div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
+
+<footer class="text-center py-4 bg-gray-100 text-sm">
+  © 2025 AgriKart. All rights reserved.
+</footer>
+<script>
+  const fertilizers = [
+    {
+      id: 1,
+      name: "Urea (F001)",
+      code: "F001",
+      image: "assets/images/fertilizers/urea.jpeg",
+      info: "High-nitrogen fertilizer for fast crop growth.",
+      use: "Used in cereal crops like wheat and rice.",
+      price: "₹300/bag",
+      delivery: "2-4 days",
+    },
+    {
+      id: 2,
+      name: "DAP (Diammonium Phosphate) (F002)",
+      code: "F002",
+      image: "assets/images/fertilizers/DAP.jpeg",
+      info: "Supplies nitrogen and phosphorus to plants.",
+      use: "Ideal for early plant growth.",
+      price: "₹1,200/bag",
+      delivery: "2-3 days",
+    },
+    {
+      id: 3,
+      name: "MOP (Muriate of Potash) (F003)",
+      code: "F003",
+      image: "assets/images/fertilizers/mop.jpeg",
+      info: "Rich in potassium to increase disease resistance.",
+      use: "Used for sugarcane, fruits, and vegetables.",
+      price: "₹900/bag",
+      delivery: "3-5 days",
+    },
+    {
+      id: 4,
+      name: "NPK 20-20-20 (F004)",
+      code: "F004",
+      image: "assets/images/fertilizers/npk.jpeg",
+      info: "Balanced fertilizer for all-around nutrition.",
+      use: "Suitable for fruits and vegetables.",
+      price: "₹850/bag",
+      delivery: "2-3 days",
+    },
+    {
+      id: 5,
+      name: "Ammonium Sulphate (F005)",
+      code: "F005",
+      image: "assets/images/fertilizers/ammoniumSulphate.jpeg",
+      info: "Nitrogen fertilizer also rich in sulfur.",
+      use: "Used for paddy and potato crops.",
+      price: "₹600/bag",
+      delivery: "4-6 days",
+    },
+    {
+      id: 6,
+      name: "Calcium Nitrate (F006)",
+      code: "F006",
+      image: "assets/images/fertilizers/calciumNitrate.jpeg",
+      info: "Water-soluble fertilizer for calcium boost.",
+      use: "Used for tomatoes and other fruiting crops.",
+      price: "₹750/bag",
+      delivery: "3-5 days",
+    },
+    {
+      id: 7,
+      name: "Zinc Sulphate (F007)",
+      code: "F007",
+      image: "assets/images/fertilizers/zincSulpate.jpeg",
+      info: "Micronutrient fertilizer to prevent zinc deficiency.",
+      use: "Used in cereals and oilseeds.",
+      price: "₹500/pack",
+      delivery: "2-4 days",
+    },
+    {
+      id: 8,
+      name: "Rock Phosphate (F008)",
+      code: "F008",
+      image: "assets/images/fertilizers/rockPhospate.jpeg",
+      info: "Natural source of phosphorus.",
+      use: "Used for long-term soil health.",
+      price: "₹400/bag",
+      delivery: "4-6 days",
+    },
+    {
+      id: 9,
+      name: "Vermicompost (F009)",
+      code: "F009",
+      image: "assets/images/fertilizers/VermiCompost.jpeg",
+      info: "Organic compost from earthworms.",
+      use: "Used in vegetables, flowers and fruits.",
+      price: "₹300/bag",
+      delivery: "3-5 days",
+    },
+    {
+      id: 10,
+      name: "Bone Meal (F010)",
+      code: "F010",
+      image: "assets/images/fertilizers/BoneMeal.jpeg",
+      info: "Organic phosphorus source from bones.",
+      use: "Used in flowering plants.",
+      price: "₹350/bag",
+      delivery: "3-4 days",
+    },
+    {
+      id: 11,
+      name: "Green Manure (F011)",
+      code: "F011",
+      image: "assets/images/fertilizers/greenManure.jpeg",
+      info: "Improves soil organic content and fertility.",
+      use: "Used for improving soil health naturally.",
+      price: "₹500/bundle",
+      delivery: "5-7 days",
+    },
+    {
+      id: 12,
+      name: "Potassium Nitrate (F012)",
+      code: "F012",
+      image: "assets/images/fertilizers/potassiumNitrate.jpeg",
+      info: "Water-soluble fertilizer for quick uptake.",
+      use: "Ideal for vegetables and horticulture crops.",
+      price: "₹950/bag",
+      delivery: "2-3 days",
+    },
+    {
+      id: 13,
+      name: "Sulphate of Potash (F013)",
+      code: "F013",
+      image: "assets/images/fertilizers/sulphatePotash.jpeg",
+      info: "High-quality potassium with sulfur.",
+      use: "Used for crops sensitive to chloride.",
+      price: "₹1,000/bag",
+      delivery: "3-5 days",
+    },
+    {
+      id: 14,
+      name: "Magnesium Sulphate (F014)",
+      code: "F014",
+      image: "assets/images/fertilizers/magnesiumSulphate.jpeg",
+      info: "Provides magnesium for chlorophyll formation.",
+      use: "Used for leafy vegetables and pulses.",
+      price: "₹550/pack",
+      delivery: "2-4 days",
+    },
+    {
+      id: 15,
+      name: "Liquid Organic Fertilizer (F015)",
+      code: "F015",
+      image: "assets/images/fertilizers/liquid.jpeg",
+      info: "Ready-to-use organic liquid for fast absorption.",
+      use: "Spray on leaves of any crops.",
+      price: "₹200/litre",
+      delivery: "1-2 days",
+    },
+    {
+      id: 16,
+      name: "Silicon Fertilizer (F016)",
+      code: "F016",
+      image: "assets/images/fertilizers/silicon.jpeg",
+      info: "Improves plant strength and resistance.",
+      use: "Used in rice and sugarcane crops.",
+      price: "₹650/bag",
+      delivery: "3-5 days",
+    },
+    {
+      id: 17,
+      name: "Humic Acid (F017)",
+      code: "F017",
+      image: "assets/images/fertilizers/humicAcid.jpeg",
+      info: "Soil conditioner that enhances nutrient uptake.",
+      use: "Used for all types of crops and soil.",
+      price: "₹300/litre",
+      delivery: "2-3 days",
+    },
+    {
+      id: 18,
+      name: "Phosphoric Acid (F018)",
+      code: "F018",
+      image: "assets/images/fertilizers/phosporicAcid.jpeg",
+      info: "Highly soluble source of phosphorus.",
+      use: "Used in drip irrigation systems.",
+      price: "₹850/litre",
+      delivery: "2-3 days",
+    }
+  ];
+
+
+
+
+    const perPage = 4;
+    let currentPage = 1;
+
+    function renderFertilizers() {
+      const container = document.getElementById("fertilizerContainer");
+      const pagination = document.getElementById("pagination");
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      container.innerHTML = "";
+
+      const filtered = fertilizers.filter(f => f.name.toLowerCase().includes(query));
+      const totalPages = Math.ceil(filtered.length / perPage);
+
+      const start = (currentPage - 1) * perPage;
+      const end = start + perPage;
+
+      filtered.slice(start, end).forEach((f, i) => {
+  const globalIndex = start + i;
+  const div = document.createElement("div");
+  div.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
+
+  div.innerHTML = `
+    <img src="${f.image}" alt="${f.name}" class="w-full h-40 object-contain rounded mb-2">
+    <h2 class="text-lg font-bold">${f.name}</h2>
+    <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${f.code}</span></p>
+    <p class="text-sm">${f.info}</p>
+    <p class="text-sm font-medium">Use: ${f.use}</p>
+    <p class="text-green-700 font-bold">${f.price}</p>
+    <p class="text-xs text-gray-500 mb-2">Delivery: ${f.delivery}</p>
+
+    <div class="flex flex-col gap-2 mt-auto">
+  <!-- Place Order button (full width) -->
+  <button onclick="placeOrder('${f.id}','${f.name}', '${f.price}', '${f.code}', '${f.image}')"
+  class="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded text-center">
+  Place Order
+</button>
+
+
+  <!-- Call and SMS buttons in same row -->
+  <div class="flex gap-2">
+    <a href="tel:8019797611" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">
+      📞 Call to Order
+    </a>
+    <a href="sms:8019797611?body=${encodeURIComponent(`I want to order ${f.name} (Code: ${f.code})`)}"
+       class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center">
+      ✉️ SMS to Order
+    </a>
+  </div>
+</div>
+
+
+
+  `;
+  container.appendChild(div);
+});
+
+
+      pagination.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-1 rounded ${i === currentPage ? "bg-green-700 text-white" : "bg-white border"}`;
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          renderFertilizers();
+        };
+        pagination.appendChild(btn);
+      }
+    }
+
+	function placeOrder(id, name, price, code, image) {
+	  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+	  const existing = cart.find(item => item.productId === id);
+	  if (existing) {
+	    existing.quantity += 1;
+	  } else {
+	    cart.push({
+	      productId: parseInt(id),  // ✅ Use `productId`, not `id`
+	      name,
+	      price,
+	      code,
+	      image,
+	      quantity: 1
+	    });
+	  }
+
+	  localStorage.setItem("cart", JSON.stringify(cart));
+	  alert(`${name} has been added to your cart.`);
+	  window.location.href = "cart.html";
+	}
+
+
+
+
+    function logout() {
+      alert("Logging out...");
+      window.location.href = "login.html";
+    }
+
+    renderFertilizers();
+  </script>
+</body>
+</html>

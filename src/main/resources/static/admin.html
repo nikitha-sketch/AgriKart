@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AgriK	art Admin Dashboard</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80');
+      background-size: cover;
+      background-attachment: fixed;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: rgba(0, 100, 0, 0.85);
+      padding: 1rem 2rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      padding: 1rem 2rem;
+      gap: 1rem;
+      background-color: rgba(0,0,0,0.6);
+    }
+    nav {
+      width: 220px;
+      background-color: rgba(0, 70, 0, 0.8);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: #cfcfcf;
+      font-size: 1.1rem;
+      padding: 1rem;
+      cursor: pointer;
+      text-align: left;
+      border-left: 5px solid transparent;
+      transition: all 0.3s ease;
+    }
+    nav button.active,
+    nav button:hover {
+      background-color: #144214;
+      color: #a6f4a6;
+      border-left: 5px solid #7ed57e;
+    }
+    section {
+      flex: 1;
+      background-color: rgba(255,255,255,0.95);
+      color: #222;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+    h2 {
+      margin-top: 0;
+      color: #064006;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #a6f4a6;
+    }
+    tr:hover {
+      background-color: #d7f7d7;
+    }
+    button.action-btn {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-right: 5px;
+    }
+    button.action-btn.delete {
+      background-color: #c62828;
+    }
+    form {
+      margin-bottom: 1rem;
+      background-color: #f0fff0;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+    input[readonly] {
+      background-color: #ddd;
+    }
+    .message {
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    .message.success {
+      background-color: #b2fab4;
+      color: #27632a;
+    }
+    .message.error {
+      background-color: #f9b2b2;
+      color: #7a1e1e;
+    }
+  </style>
+</head>
+<body>
+
+<header>AgriMart Admin Dashboard</header>
+
+<main>
+  <nav>
+    <button id="tab-users" class="active" onclick="showTab('users')">Users</button>
+    <button id="tab-products" onclick="showTab('products')">Products</button>
+    <button id="tab-orders" onclick="showTab('orders')">Orders</button>
+  </nav>
+
+  <section id="tab-content-users">
+    <h2>Users</h2>
+    <table id="users-table">
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Phone</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <!-- Users will be populated here -->
+      </tbody>
+    </table>
+
+    <h3>User Orders</h3>
+    <table id="user-orders-table" style="display:none;">
+      <thead>
+        <tr><th>Order ID</th><th>Product Name</th><th>Quantity</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <!-- Orders for selected user -->
+      </tbody>
+    </table>
+  </section>
+
+  <section id="tab-content-products" style="display:none;">
+    <h2>Products</h2>
+
+    <form id="product-form">
+      <input type="hidden" id="product-id" />
+      <label for="product-code">Product Code (Unique)</label>
+      <input type="text" id="product-code" placeholder="E.g., P001" required />
+
+      <label for="product-name">Product Name</label>
+      <input type="text" id="product-name" placeholder="E.g., Tractor Brand" required />
+
+      <label for="product-category">Category</label>
+      <select id="product-category" required>
+        <option value="">Select Category</option>
+        <option value="Pesticides">Pesticides</option>
+        <option value="Tractors">Tractors</option>
+        <option value="Fertilizers">Fertilizers</option>
+        <option value="Seeds">Seeds</option>
+        <option value="Tools">Tools</option>
+      </select>
+
+      <label for="product-use">Use</label>
+      <input type="text" id="product-use" placeholder="Product use description" required />
+
+      <label for="product-cause">Cause</label>
+      <input type="text" id="product-cause" placeholder="Product cause description" required />
+
+      <label for="product-price">Price (₹)</label>
+      <input type="number" id="product-price" min="0" placeholder="E.g., 600" required />
+
+      <label for="product-delivery">Delivery Time</label>
+      <input type="text" id="product-delivery" placeholder="E.g., 4-6 days" required />
+
+      <button type="submit" id="product-submit-btn">Add Product</button>
+      <button type="button" id="product-cancel-btn" style="display:none;">Cancel Edit</button>
+    </form>
+
+    <table id="products-table">
+      <thead>
+        <tr>
+          <th>Code</th><th>Name</th><th>Category</th><th>Price (₹)</th><th>Delivery</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Products here -->
+      </tbody>
+    </table>
+  </section>
+
+  <section id="tab-content-orders" style="display:none;">
+    <h2>Orders</h2>
+    <label for="filter-user">Filter by User:</label>
+    <select id="filter-user" onchange="filterOrdersByUser()">
+      <option value="">-- All Users --</option>
+      <!-- Users options will be populated -->
+    </select>
+
+    <table id="orders-table">
+      <thead>
+        <tr><th>Order ID</th><th>User</th><th>Product</th><th>Quantity</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <!-- Orders -->
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+  // Global state
+  let users = [];
+  let products = [];
+  let orders = [];
+  let editingProductId = null;
+
+  // Show tab
+  function showTab(tab) {
+    document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    document.querySelectorAll('main > section').forEach(sec => sec.style.display = 'none');
+    document.getElementById('tab-content-' + tab).style.display = 'block';
+
+    if (tab === 'users') loadUsers();
+    if (tab === 'products') loadProducts();
+    if (tab === 'orders') loadOrders();
+  }
+
+  // Fetch users from backend (replace URL with your API)
+  async function loadUsers() {
+  try {
+    const res = await fetch('http://localhost:8080/api/users');
+    users = await res.json();
+    populateUsersTable();
+    populateUserFilter();
+  } catch (error) {
+    alert('Failed to load users');
+    console.error(error);
+  }
+}
+
+  function populateUsersTable() {
+    const tbody = document.querySelector('#users-table tbody');
+    tbody.innerHTML = '';
+    users.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.name}</td>
+        <td>${u.email}</td>
+        <td>${u.phone}</td>
+        <td>
+          <button class="action-btn" onclick="showUserOrders(${u.id})">View Orders</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Show orders for a user
+  async function showUserOrders(userId) {
+    try {
+      // Fetch user orders from backend
+      // const res = await fetch(`/api/orders/user/${userId}`);
+      // const userOrders = await res.json();
+
+      // MOCK orders for demo
+      const userOrders = [
+        {id: 101, productName: "Tractor Brand", quantity: 1, date: "2025-06-05"},
+        {id: 102, productName: "Pesticide A", quantity: 3, date: "2025-06-07"}
+      ];
+
+      const tbody = document.querySelector('#user-orders-table tbody');
+      tbody.innerHTML = '';
+      userOrders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${o.id}</td>
+          <td>${o.productName}</td>
+          <td>${o.quantity}</td>
+          <td>${o.date}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('user-orders-table').style.display = 'table';
+    } catch (err) {
+      alert('Error loading user orders');
+      console.error(err);
+    }
+  }
+
+  function clearUserOrders() {
+    document.querySelector('#user-orders-table tbody').innerHTML = '';
+    document.getElementById('user-orders-table').style.display = 'none';
+  }
+
+  // Product section
+
+  async function loadProducts() {
+  try {
+    const res = await fetch('http://localhost:8080/api/products');
+    products = await res.json();
+    populateProductsTable();
+  } catch (error) {
+    alert('Failed to load products');
+    console.error(error);
+  }
+}
+
+  function populateProductsTable() {
+    const tbody = document.querySelector('#products-table tbody');
+    tbody.innerHTML = '';
+    products.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.code}</td>
+        <td>${p.name}</td>
+        <td>${p.category}</td>
+        <td>₹${p.price}</td>
+        <td>${p.delivery}</td>
+        <td>
+          <button class="action-btn" onclick="editProduct(${p.id})">Edit</button>
+          <button class="action-btn delete" onclick="deleteProduct(${p.id})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function resetProductForm() {
+    editingProductId = null;
+    document.getElementById('product-id').value = '';
+    document.getElementById('product-code').value = '';
+    document.getElementById('product-name').value = '';
+    document.getElementById('product-category').value = '';
+    document.getElementById('product-use').value = '';
+    document.getElementById('product-cause').value = '';
+    document.getElementById('product-price').value = '';
+    document.getElementById('product-delivery').value = '';
+    document.getElementById('product-submit-btn').textContent = 'Add Product';
+    document.getElementById('product-cancel-btn').style.display = 'none';
+  }
+
+  document.getElementById('product-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const code = document.getElementById('product-code').value.trim();
+    const name = document.getElementById('product-name').value.trim();
+    const category = document.getElementById('product-category').value;
+    const use = document.getElementById('product-use').value.trim();
+    const cause = document.getElementById('product-cause').value.trim();
+    const price = parseFloat(document.getElementById('product-price').value);
+    const delivery = document.getElementById('product-delivery').value.trim();
+
+    // Validate unique code (ignore self if editing)
+    if(products.some(p => p.code.toLowerCase() === code.toLowerCase() && p.id !== editingProductId)) {
+      alert('Product code already exists. Please use a unique code.');
+      return;
+    }
+
+    if(editingProductId) {
+      // Update product
+      let product = products.find(p => p.id === editingProductId);
+      product.code = code;
+      product.name = name;
+      product.category = category;
+      product.use = use;
+      product.cause = cause;
+      product.price = price;
+      product.delivery = delivery;
+
+      // Update backend with PUT request here (replace URL)
+      // fetch(`/api/products/${editingProductId}`, {method:'PUT', body: JSON.stringify(product) ...})
+
+      alert('Product updated!');
+    } else {
+      // Add product
+      const newProduct = {
+        id: Math.max(...products.map(p=>p.id))+1,
+        code, name, category, use, cause, price, delivery
+      };
+      products.push(newProduct);
+
+      // Send to backend with POST request here (replace URL)
+      // fetch('/api/products', {method:'POST', body: JSON.stringify(newProduct) ...})
+
+      alert('Product added!');
+    }
+    populateProductsTable();
+    resetProductForm();
+  });
+
+  document.getElementById('product-cancel-btn').addEventListener('click', resetProductForm);
+
+  function editProduct(id) {
+    const product = products.find(p => p.id === id);
+    if(!product) return;
+    editingProductId = id;
+    document.getElementById('product-id').value = product.id;
+    document.getElementById('product-code').value = product.code;
+    document.getElementById('product-name').value = product.name;
+    document.getElementById('product-category').value = product.category;
+    document.getElementById('product-use').value = product.use;
+    document.getElementById('product-cause').value = product.cause;
+    document.getElementById('product-price').value = product.price;
+    document.getElementById('product-delivery').value = product.delivery;
+    document.getElementById('product-submit-btn').textContent = 'Update Product';
+    document.getElementById('product-cancel-btn').style.display = 'inline-block';
+  }
+
+  function deleteProduct(id) {
+    if(!confirm('Are you sure to delete this product?')) return;
+    products = products.filter(p => p.id !== id);
+
+    // Delete from backend here with DELETE request
+    // fetch(`/api/products/${id}`, {method: 'DELETE'})
+
+    populateProductsTable();
+    resetProductForm();
+  }
+
+  // Orders section
+
+  async function loadOrders() {
+  try {
+    const res = await fetch('http://localhost:8080/api/orders');
+    orders = await res.json();
+    populateOrdersTable();
+  } catch (error) {
+    alert('Failed to load orders');
+    console.error(error);
+  }
+}
+
+  function populateOrdersTable(filterUserId) {
+    const tbody = document.querySelector('#orders-table tbody');
+    tbody.innerHTML = '';
+
+    let filteredOrders = orders;
+    if(filterUserId) filteredOrders = orders.filter(o => o.userId == filterUserId);
+
+    filteredOrders.forEach(o => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${o.id}</td>
+        <td>${o.userName}</td>
+        <td>${o.productName}</td>
+        <td>${o.quantity}</td>
+        <td>${o.date}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Populate user filter dropdown in orders tab
+  function populateUserFilter() {
+    const select = document.getElementById('filter-user');
+    select.innerHTML = '<option value="">-- All Users --</option>';
+    users.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.name;
+      select.appendChild(opt);
+    });
+  }
+
+  function filterOrdersByUser() {
+    const userId = document.getElementById('filter-user').value;
+    populateOrdersTable(userId || null);
+  }
+  async function saveProduct(product) {
+  const url = editingProductId ? `/api/products/${editingProductId}` : '/api/products';
+  const method = editingProductId ? 'PUT' : 'POST';
+
+  const res = await fetch(url, {
+    method: method,
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(product)
+  });
+
+  if (!res.ok) {
+    alert('Failed to save product');
+  } else {
+    alert('Product saved successfully');
+    await loadProducts();
+    resetProductForm();
+  }
+}
+
+  // Initial load on page load
+  window.onload = () => {
+    showTab('users');
+  };
+</script>
+
+</body>
+</html>

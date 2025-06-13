@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seeds - AgriKart</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+</style>
+</head>
+<body class="bg-green-50 text-gray-900">
+
+<!-- Navbar -->
+<header class="bg-green-700 text-white flex justify-between items-center p-4">
+  <h1 class="text-2xl font-bold">AgriKart - Seeds</h1>
+  
+  <nav class="flex items-center space-x-6">
+    <a href="index.html" class="hover:underline">Home</a>
+
+    <div class="relative group">
+      <button class="hover:underline focus:outline-none">Products</button>
+      <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
+        <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
+        <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
+        <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
+        <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search Seeds..."
+      class="p-2 rounded text-black"
+      oninput="filterSeeds()"
+    />
+    <a href="cart.html" class="hover:underline">Cart</a>
+    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+  </nav>
+</header>
+
+
+
+<section id="seedGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+  <!-- Cards inserted by JS -->
+</section>
+
+<div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
+
+<footer class="text-center py-4 bg-gray-100 text-sm">
+  © 2025 AgriKart. All rights reserved.
+</footer>
+
+<script>
+  const seeds = [
+  {
+    code: "S001",
+    name: "Hybrid Tomato",
+    image: "assets/images/seeds/Tomato.jpeg",
+    use: "High-yield tomato farming.",
+    cause: "Improved disease resistance and shelf life.",
+    price: "₹120 / 50g",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S002",
+    name: "Cluster Beans (Guar)",
+    image: "assets/images/seeds/clusterBeans.jpeg",
+    use: "Used as a vegetable and in guar gum production.",
+    cause: "Drought resistant, improves soil fertility.",
+    price: "₹120 / 500g",
+    delivery: "3-4 days",
+  },
+  {
+    code: "S003",
+    name: "Gongura (Red Sorrel Leaves)",
+    image: "assets/images/seeds/gongura.jpeg",
+    use: "Popular leafy vegetable in Andhra cuisine.",
+    cause: "Fast-growing, rich in iron and vitamins.",
+    price: "₹90 / 100g",
+    delivery: "2-4 days",
+  },
+  {
+    code: "S004",
+    name: "Paddy (Sona Masoori)",
+    image: "assets/images/seeds/sonaMasoori.jpeg",
+    use: "Main crop for rice production.",
+    cause: "High yield, medium grain, and disease resistance.",
+    price: "₹250 / 1kg",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S005",
+    name: "Bengal Gram (Chana)",
+    image: "assets/images/seeds/bengalgram.jpeg",
+    use: "Pulses for human consumption and soil enrichment.",
+    cause: "Protein-rich and drought resistant.",
+    price: "₹160 / 1kg",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S006",
+    name: "Sesame (Til)",
+    image: "assets/images/seeds/sesame.jpeg",
+    use: "Oilseed crop for edible oil production.",
+    cause: "High oil content and pest tolerance.",
+    price: "₹180 / 500g",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S007",
+    name: "Black Gram (Urad)",
+    image: "assets/images/seeds/blackgram.jpeg",
+    use: "Pulse crop and essential for idli/dosa batter.",
+    cause: "Improves soil fertility and offers high protein.",
+    price: "₹150 / 1kg",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S008",
+    name: "Basmati Rice",
+    image: "assets/images/seeds/basmathi.jpeg",
+    use: "Long-grain aromatic rice.",
+    cause: "Ideal for premium rice cultivation.",
+    price: "₹300 / 1kg",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S009",
+    name: "Sunflower Seeds",
+    image: "assets/images/seeds/sunflower.jpeg",
+    use: "Oil seed production.",
+    cause: "High oil content and yield.",
+    price: "₹180 / 500g",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S010",
+    name: "Maize Hybrid",
+    image: "assets/images/seeds/maize.jpeg",
+    use: "Cereal crop for food and fodder.",
+    cause: "Fast maturity and pest resistance.",
+    price: "₹150 / 1kg",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S011",
+    name: "Groundnut",
+    image: "assets/images/seeds/groundnut.jpeg",
+    use: "Oil and food crop.",
+    cause: "High oil yield and disease resistance.",
+    price: "₹130 / 1kg",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S012",
+    name: "Wheat",
+    image: "assets/images/seeds/wheat.jpeg",
+    use: "Staple cereal crop.",
+    cause: "Drought resistance and high productivity.",
+    price: "₹160 / 1kg",
+    delivery: "5-7 days",
+  },
+  {
+    code: "S013",
+    name: "Cotton",
+    image: "assets/images/seeds/cotton.jpeg",
+    use: "Fiber crop for textile.",
+    cause: "Pest resistant and high fiber strength.",
+    price: "₹220 / 500g",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S014",
+    name: "Chilli Hybrid",
+    image: "assets/images/seeds/chilli.jpeg",
+    use: "Spice crop.",
+    cause: "High pungency and yield.",
+    price: "₹140 / 100g",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S015",
+    name: "Onion Seeds",
+    image: "assets/images/seeds/onion.jpeg",
+    use: "Bulb vegetable farming.",
+    cause: "Better storage and high bulb formation.",
+    price: "₹100 / 50g",
+    delivery: "4-6 days",
+  },
+  {
+    code: "S016",
+    name: "Brinjal",
+    image: "assets/images/seeds/brinjal.jpeg",
+    use: "Vegetable farming.",
+    cause: "Resistance to shoot and fruit borer.",
+    price: "₹90 / 50g",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S017",
+    name: "Pumpkin",
+    image: "assets/images/seeds/pumpkin.jpeg",
+    use: "Vegetable crop.",
+    cause: "High yield and long shelf life.",
+    price: "₹110 / 100g",
+    delivery: "3-5 days",
+  },
+  {
+    code: "S018",
+    name: "Cucumber",
+    image: "assets/images/seeds/cucumber.jpeg",
+    use: "Salad and summer crop.",
+    cause: "Early harvest and juicy fruits.",
+    price: "₹95 / 50g",
+    delivery: "3-4 days",
+  },
+  {
+    code: "S019",
+    name: "Bitter Gourd",
+    image: "assets/images/seeds/bitterGourd.jpeg",
+    use: "Medicinal and vegetable use.",
+    cause: "Good shelf life and high nutrition.",
+    price: "₹100 / 50g",
+    delivery: "4-5 days",
+  },
+  {
+    code: "S020",
+    name: "Lady Finger (Okra)",
+    image: "assets/images/seeds/ladyFinger.jpeg",
+    use: "Popular vegetable crop.",
+    cause: "Tender pods and high yield.",
+    price: "₹120 / 100g",
+    delivery: "3-5 days",
+  }
+];
+
+
+  const itemsPerPage = 4;
+  let currentPage = 1;
+  let filteredSeeds = seeds;
+
+  function displaySeeds(page = 1) {
+  currentPage = page;
+  
+  const seedGrid = document.getElementById('seedGrid');
+  seedGrid.innerHTML = '';
+
+  const start = (page - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = filteredSeeds.slice(start, end);
+
+  pageItems.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'relative group bg-white shadow-lg rounded-lg p-4 flex flex-col transition-transform transform hover:scale-105';
+
+    card.innerHTML = `
+      <img src="${s.image}" alt="${s.name}" class="h-48 w-full object-contain rounded-md mb-3" />
+      <h2 class="text-xl font-semibold">${s.name}</h2>
+      <p class="text-sm mt-1 font-semibold">Product Code: <span class="font-normal">${s.code}</span></p>
+      <p class="text-sm mt-1 font-semibold">Use: <span class="font-normal">${s.use}</span></p>
+      <p class="text-sm mt-1 font-semibold">Benefit: <span class="font-normal">${s.cause}</span></p>
+      <p class="text-sm mt-1 font-semibold">Price: <span class="font-normal">${s.price}</span></p>
+      <p class="text-sm mt-1 font-semibold">Delivery: <span class="font-normal">${s.delivery}</span></p>
+      <button onclick='placeOrder(${JSON.stringify(s)})' class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Place Order</button>
+      
+      <div class="mt-3 flex space-x-3">
+  <a href="tel:+918019797611" class="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded text-center flex-1">
+    Call to Order
+  </a>
+  <a href="sms:+918019797611?body=I want to order: ${s.name} (Code: ${s.code})" class="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded text-center flex-1">
+    SMS to Order
+  </a>
+</div>
+
+
+
+      <!-- Tooltip -->
+      <div class="absolute top-2 left-2 bg-yellow-100 text-green-900 text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 shadow">
+        ${s.name}
+      </div>
+    `;
+
+    seedGrid.appendChild(card);
+  });
+
+  setupPagination();
+}
+
+
+  function setupPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    const totalPages = Math.ceil(filteredSeeds.length / itemsPerPage);
+
+    for(let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = `px-4 py-2 rounded ${i === currentPage ? 'bg-green-700 text-white' : 'bg-green-300 text-green-900 hover:bg-green-500'}`;
+      btn.onclick = () => displaySeeds(i);
+      pagination.appendChild(btn);
+    }
+  }
+
+  function filterSeeds() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    filteredSeeds = seeds.filter(s => 
+      s.name.toLowerCase().includes(query) || s.use.toLowerCase().includes(query)
+    );
+    displaySeeds(1);
+  }
+  
+   function placeOrder(item) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.push(item);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${item.name} added to cart!`);
+    window.location.href = "cart.html";
+  }
+
+function logout() {
+      alert("Logging out...");
+      window.location.href = "login.html";
+    }
+
+  // Initial load
+  displaySeeds();
+</script>
+
+</body>
+</html>

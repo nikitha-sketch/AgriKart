@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AgriKart - Village Agro Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+    }
+
+    .bg-full {
+      background-image: url('https://images.unsplash.com/photo-1568605114967-8130f3a36994');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+    }
+  @keyframes slideRightToLeftOnce {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .slide-in {
+    animation: slideRightToLeftOnce 2s ease forwards;
+  }
+
+  .delayed-show {
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  .delayed-show.visible {
+    opacity: 1;
+  }
+
+
+
+    #welcomeMsg {
+      white-space: nowrap;
+      display: inline-block;
+      animation: slideRightToLeftOnce 6s ease forwards;
+    }
+  </style>
+</head>
+
+<body class="bg-green-50">
+  <div class="bg-full">
+    <div class="overlay"></div>
+
+    <!-- Navbar -->
+    <nav class="bg-green-900 text-white px-4 py-3 flex justify-between items-center relative z-40">
+      <a href="index.html" class="text-2xl font-bold">AgriKart</a>
+
+      <ul class="flex items-center space-x-6">
+        <li><a href="index.html" class="hover:underline">Home</a></li>
+
+        <!-- Dropdown Menu -->
+        <li class="relative group">
+          <button class="hover:underline cursor-pointer focus:outline-none">Products</button>
+          <ul class="absolute hidden group-hover:block bg-white text-green-900 mt-2 rounded shadow-md w-48 z-30">
+            <li><a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a></li>
+            <li><a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a></li>
+            <li><a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a></li>
+            <li><a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a></li>
+          </ul>
+        </li>
+		<li><a href="cart.html" class="hover:underline">Cart</a></li>
+        <li><a href="help.html" class="hover:underline">Help</a></li>
+      </ul>
+
+      <button id="logoutBtn" class="bg-green-700 hover:bg-green-800 px-3 py-1 rounded font-semibold">Logout</button>
+    </nav>
+
+    <main class="content flex flex-col items-center justify-center h-[calc(100vh-64px)] text-white px-4 text-center space-y-4">
+  <h1 id="welcomeMsg" class="text-4xl md:text-6xl font-extrabold drop-shadow-lg slide-in">
+    Welcome to AgriKart -Viruvuru Kisan Store
+  </h1>
+  <div id="afterLines" class="delayed-show">
+    <h2 class="text-xl md:text-2xl font-semibold drop-shadow-md">
+      🌿 AgriKart – Our One-Stop Shop for All Your Farming Needs
+    </h2>
+    <h2 class="text-lg md:text-xl drop-shadow-md">
+      🚜 Delivering Quality Seeds, Tools, Fertilizers & Pesticides to Your Doorstep
+    </h2>
+  </div>
+</main>
+
+
+
+  </div>
+
+  <script>
+  window.onload = () => {
+    // Redirect to signin if needed
+    // window.location.href = "signin.html";
+
+    // Show the lines after animation ends
+    setTimeout(() => {
+      document.getElementById('afterLines').classList.add('visible');
+    }, 2000);
+  };
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    window.location.href = "login.html";
+  });
+</script>
+
+
+</body>
+</html>
+
