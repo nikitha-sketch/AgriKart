@@ -1,21 +1,22 @@
 package com.agrikart.agrikartKisan.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PostMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.agrikart.agrikartKisan.dto.UserDTO;
 import com.agrikart.agrikartKisan.model.User;
-import com.agrikart.agrikartKisan.repository.UserRepository;
+
 import com.agrikart.agrikartKisan.service.UserService;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
 
     // Register new user
     @PostMapping("/sign_up")
@@ -56,6 +58,12 @@ public class UserController {
         }
     }*/
 
+    @GetMapping
+    public ResponseEntity<List<User>> getAllNonAdminUsers() {
+        return ResponseEntity.ok(userService.getAllNonAdminUsers());
+    }
+
+   
 
 }
 

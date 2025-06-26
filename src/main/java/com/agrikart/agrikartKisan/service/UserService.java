@@ -1,6 +1,6 @@
 package com.agrikart.agrikartKisan.service;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,5 +38,12 @@ public class UserService {
     public User loginUser(String email, String password) {
         return userRepository.findByEmailAndPassword(email, password);
     }
+    /*public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }*/
+    public List<User> getAllNonAdminUsers() {
+        return userRepository.findByRoleNot("admin");
+    }
+
 
 }

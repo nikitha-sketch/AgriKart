@@ -57,285 +57,132 @@
   <footer class="text-center py-4 bg-gray-100 text-sm">
     © 2025 AgriKart. All rights reserved.
   </footer>
+  <script>
+    let pesticides = [];
+    let filteredPesticides = [];
+    const itemsPerPage = 4;
+    let currentPage = 1;
 
-<script>
-  const pesticides = [
-  {
-    code: "P001",
-    name: "Bayer Confidor",
-    image: "assets/images/pesticides/Confidor.jpeg",
-    use: "Effective against sucking pests.",
-    cause: "Controls aphids, whiteflies, and other sap-feeding insects.",
-    price: "₹450 / 250ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P002",
-    name: "Tractor Brand",
-    image: "assets/images/pesticides/Tractor_brand.jpeg",
-    use: "Multipurpose broad-spectrum pesticide.",
-    cause: "Kills a wide range of pests on multiple crops.",
-    price: "₹600 / 500ml",
-    delivery: "4-6 days",
-  },
-  {
-    code: "P003",
-    name: "Organic Guard",
-    image: "assets/images/pesticides/GreenGuard.jpeg",
-    use: "Natural pesticide for eco farming.",
-    cause: "Made from plant extracts, safe for environment.",
-    price: "₹350 / 300ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P004",
-    name: "GreenSpray",
-    image: "assets/images/pesticides/greenSpray.jpeg",
-    use: "Eco-friendly insecticide spray.",
-    cause: "Targets harmful insects without affecting beneficial ones.",
-    price: "₹500 / 400ml",
-    delivery: "3-4 days",
-  },
-  {
-    code: "P005",
-    name: "CropGuard Ultra",
-    image: "assets/images/pesticides/cropGuard.jpeg",
-    use: "Protects crops from fungal infections.",
-    cause: "Effective against powdery mildew and rust.",
-    price: "₹520 / 400ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P006",
-    name: "InsectoShield",
-    image: "assets/images/pesticides/insectoShield.jpeg",
-    use: "Broad spectrum insecticide.",
-    cause: "Controls beetles, caterpillars, and aphids.",
-    price: "₹480 / 350ml",
-    delivery: "4-6 days",
-  },
-  {
-    code: "P007",
-    name: "BioNeem Spray",
-    image: "/home/rguktrkvalley/Desktop/agrikart/assets/images/pesticides/bioneem.jpeg",
-    
-    use: "Organic insect repellent.",
-    cause: "Derived from neem tree, safe for beneficial insects.",
-    price: "₹400 / 500ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P008",
-    name: "Fungicide Pro",
-    image: "assets/images/pesticides/fungicide_pro.jpeg",
-    use: "Fungicide for all major crops.",
-    cause: "Prevents and controls fungal diseases.",
-    price: "₹600 / 300ml",
-    delivery: "4-6 days",
-  },
-  {
-    code: "P009",
-    name: "Terminator XT",
-    image: "assets/images/pesticides/terminator.jpeg",
-    use: "Termite control pesticide.",
-    cause: "Kills termites and protects wood structures.",
-    price: "₹700 / 250ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P010",
-    name: "WeedAway",
-    image: "assets/images/pesticides/weedaway.jpeg",
-    use: "Herbicide for weed control.",
-    cause: "Kills broadleaf and grassy weeds effectively.",
-    price: "₹650 / 500ml",
-    delivery: "5-7 days",
-  },
-  {
-    code: "P011",
-    name: "SafeGuard",
-    image: "assets/images/pesticides/safeguard.jpeg",
-    use: "Safe pesticide for vegetables.",
-    cause: "Non-toxic and environment friendly.",
-    price: "₹480 / 300ml",
-    delivery: "3-4 days",
-  },
-  {
-    code: "P012",
-    name: "MiteX",
-    image: "assets/images/pesticides/mitex.jpeg",
-    use: "Mite control spray.",
-    cause: "Eradicates spider mites and other pests.",
-    price: "₹560 / 400ml",
-    delivery: "4-6 days",
-  },
-  {
-    code: "P013",
-    name: "LeafShield",
-    image: "assets/images/pesticides/leafShield.jpeg",
-    use: "Protects leaves from diseases.",
-    cause: "Prevents leaf spots and blights.",
-    price: "₹620 / 350ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P014",
-    name: "EcoHume",
-    image: "assets/images/pesticides/ecohume.jpeg",
-    use: "Fumigant for stored grains.",
-    cause: "Kills storage pests efficiently.",
-    price: "₹700 / 500ml",
-    delivery: "5-7 days",
-  },
-  {
-    code: "P015",
-    name: "PowerNeem",
-    image: "assets/images/pesticides/neemPower.jpeg",
-    use: "Neem-based pesticide for multiple pests.",
-    cause: "Eco-friendly and biodegradable.",
-    price: "₹450 / 300ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P016",
-    name: "CropCare Plus",
-    image: "assets/images/pesticides/termistop.jpeg",
-    use: "Multi-purpose pesticide.",
-    cause: "Controls insects and fungal diseases.",
-    price: "₹550 / 400ml",
-    delivery: "4-6 days",
-  },
-  {
-    code: "P017",
-    name: "TermiStop",
-    image: "assets/images/pesticides/termistop.jpeg",
-    use: "Termite and pest control.",
-    cause: "Provides long-term protection.",
-    price: "₹680 / 350ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P018",
-    name: "WeedEx",
-    image: "assets/images/pesticides/weedex.jpeg",
-    use: "Selective herbicide.",
-    cause: "Targets specific weeds without harming crops.",
-    price: "₹600 / 500ml",
-    delivery: "5-7 days",
-  },
-  {
-    code: "P019",
-    name: "Dicofol",
-    image: "assets/images/pesticides/difol.jpeg",
-    use: "Effective acaricide for controlling mites and other pests on crops.",
-    cause: "Controls red spider mites, whiteflies, and other harmful insects.",
-    price: "₹650 / 500ml",
-    delivery: "3-5 days",
-  },
-  {
-    code: "P020",
-    name: "Hurricane",
-    image: "assets/images/pesticides/hurricane.jpeg",
-    use: "Broad-spectrum insecticide for sucking and chewing pests.",
-    cause: "Effective against aphids, whiteflies, thrips, and caterpillars.",
-    price: "₹720 / 1 liter",
-    delivery: "2-4 days",
-  }
-];
+    async function loadPesticidesFromBackend() {
+      try {
+        //const res = await fetch("http://localhost:8080/api/products?category=Pesticides");
+		const res = await fetch("http://localhost:8080/api/products/category?name=Pesticides");
+        const data = await res.json();
+		pesticides = data.map(p => ({
+		  productId: p.id,
+		  code: p.code,
+		  name: `${p.name} (${p.code})`,
+		  image: p.imageUrl,
+		  
+		  use: p.use || 'No info',
 
+		  cause: p.cause || "Detailed description not available.",
+		
+		  price: `₹${p.price}`,
+		  delivery: p.delivery && p.delivery.trim() !== "" ? p.delivery : "1-2 days"
+		}));
 
-  const itemsPerPage = 4;
-  let currentPage = 1;
-  let filteredPesticides = pesticides;
-
-  function displayPesticides(page = 1) {
-  currentPage = page;
-  const pesticideGrid = document.getElementById('pesticideGrid');
-  pesticideGrid.innerHTML = '';
-  const start = (page - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const pageItems = filteredPesticides.slice(start, end);
-
-  pageItems.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full';
-
-    // Clean price (remove ₹ symbol and unit for SMS if needed)
-    const smsMessage = `I want to order ${p.name} (Code: ${p.code}) priced at ${p.price}.`;
-
-    card.innerHTML = `
-      <img src="${p.image}" alt="${p.name}" class="h-48 w-full object-contain rounded-md mb-3" />
-      <h2 class="text-xl font-semibold">${p.name}</h2>
-      <p class="text-sm mt-1 font-semibold">Product Code: <span class="font-normal">${p.code}</span></p>
-      <p class="text-sm mt-1 font-semibold">Use: <span class="font-normal">${p.use}</span></p>
-      <p class="text-sm mt-1 font-semibold">Cause: <span class="font-normal">${p.cause}</span></p>
-      <p class="text-sm mt-1 font-semibold">Price: <span class="font-normal">${p.price}</span></p>
-      <p class="text-sm mt-1 font-semibold">Delivery: <span class="font-normal">${p.delivery}</span></p>
-
-
-	<!-- Place Order Button -->
-      <button onclick='placeOrder(${JSON.stringify(p)})' class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Place Order</button>
-	
-      <!-- Buttons Row -->
-      <div class="flex justify-between gap-2 mt-3">
-        <a href="tel:+919876543210" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center w-1/2">
-          Call to Order
-        </a>
-        <a href="sms:+919876543210?body=${encodeURIComponent(smsMessage)}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center w-1/2">
-          SMS to Order
-        </a>
-      </div>
-
-      
-    `;
-    pesticideGrid.appendChild(card);
-  });
-
-  setupPagination();
-}
-
-
-  function setupPagination() {
-    const pagination = document.getElementById('pagination');
-    pagination.innerHTML = '';
-    const totalPages = Math.ceil(filteredPesticides.length / itemsPerPage);
-
-    for(let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement('button');
-      btn.textContent = i;
-      btn.className = `px-4 py-2 rounded ${i === currentPage ? 'bg-green-700 text-white' : 'bg-green-300 text-green-900 hover:bg-green-500'}`;
-      btn.onclick = () => displayPesticides(i);
-      pagination.appendChild(btn);
+        filteredPesticides = [...pesticides];
+        displayPesticides();
+      } catch (error) {
+        console.error("Error loading pesticides:", error);
+      }
     }
-  }
 
- function filterPesticides() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  filteredPesticides = pesticides.filter(p =>
-    p.name.toLowerCase().includes(query) ||
-    p.code.toLowerCase().includes(query) ||
-    p.use.toLowerCase().includes(query) ||
-    p.cause.toLowerCase().includes(query)
-  );
-  displayPesticides(1); // Reset to page 1 after filtering
-}
+    function displayPesticides(page = 1) {
+      currentPage = page;
+      const pesticideGrid = document.getElementById('pesticideGrid');
+      pesticideGrid.innerHTML = '';
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageItems = filteredPesticides.slice(start, end);
 
- function placeOrder(item) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(item);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${item.name} added to cart!`);
-    window.location.href = "cart.html";
-  }
+      pageItems.forEach(p => {
+        const smsMessage = `I want to order ${p.name} (Code: ${p.code}) priced at ${p.price}.`;
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full';
 
-function logout() {
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" class="h-48 w-full object-contain rounded-md mb-3" />
+          <h2 class="text-xl font-semibold">${p.name}</h2>
+          <p class="text-sm mt-1 font-semibold">Product Code: <span class="font-normal">${p.code}</span></p>
+          <p class="text-sm mt-1 font-semibold">Use: <span class="font-normal">${p.use}</span></p>
+          <p class="text-sm mt-1 font-semibold">Cause: <span class="font-normal">${p.cause}</span></p>
+          <p class="text-sm mt-1 font-semibold">Price: <span class="font-normal">${p.price}</span></p>
+          <p class="text-sm mt-1 font-semibold">Delivery: <span class="font-normal">${p.delivery}</span></p>
+
+          <button onclick='placeOrder(${JSON.stringify(p)})' class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Place Order
+          </button>
+
+          <div class="flex justify-between gap-2 mt-3">
+            <a href="tel:+919876543210" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center w-1/2">
+              Call to Order
+            </a>
+            <a href="sms:+919876543210?body=${encodeURIComponent(smsMessage)}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center w-1/2">
+              SMS to Order
+            </a>
+          </div>
+        `;
+        pesticideGrid.appendChild(card);
+      });
+
+      setupPagination();
+    }
+
+    function setupPagination() {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+      const totalPages = Math.ceil(filteredPesticides.length / itemsPerPage);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `px-4 py-2 rounded ${i === currentPage ? 'bg-green-700 text-white' : 'bg-green-300 text-green-900 hover:bg-green-500'}`;
+        btn.onclick = () => displayPesticides(i);
+        pagination.appendChild(btn);
+      }
+    }
+
+    function filterPesticides() {
+      const query = document.getElementById('searchInput')?.value.toLowerCase() || '';
+      filteredPesticides = pesticides.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.code.toLowerCase().includes(query) ||
+        p.use.toLowerCase().includes(query) ||
+        p.cause.toLowerCase().includes(query)
+      );
+      displayPesticides(1);
+    }
+
+    function placeOrder(item) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      const newItem = {
+        id: item.productId,
+        code: item.code,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        category: "Pesticides",
+        quantity: 1
+      };
+
+      cart.push(newItem);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${item.name} added to cart!`);
+      window.location.href = "cart.html";
+    }
+
+    function logout() {
       alert("Logging out...");
       window.location.href = "login.html";
     }
 
-  // Initial load
-  displayPesticides();
-</script>
+    // Load pesticides on page load
+    document.addEventListener("DOMContentLoaded", loadPesticidesFromBackend);
+  </script>
+
 
 </body>
 </html>

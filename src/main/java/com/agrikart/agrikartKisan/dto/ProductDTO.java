@@ -10,10 +10,12 @@ public class ProductDTO {
     @Size(max = 100, message = "Product name must be under 100 characters")
     private String name;
 
-    @NotBlank(message = "Description is required")
-    @Size(max = 500, message = "Description must be under 500 characters")
-    private String description;
+    //@NotBlank(message = "Description is required")
+    //@Size(max = 500, message = "Description must be under 500 characters")
+    //private String description;
 
+    private String use;
+    
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be greater than 0")
     private Double price;
@@ -21,14 +23,22 @@ public class ProductDTO {
     @NotBlank(message = "Category is required")
     private String category;
 
+    private String code;
+    private String imageUrl;
+    private String delivery;
+    
+    private String cause;
     public ProductDTO() {}
 
-    public ProductDTO(Long id, String name, String description, Double price, String category) {
+    public ProductDTO(Long id, String name, Double price, String category,String code,String imageUrl,String delivery,String cause,String use) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.price = price;
         this.category = category;
+        this.imageUrl=imageUrl;
+        this.delivery=delivery;
+        this.use=use;
+        this.cause=cause;
     }
 
     // Getters and Setters
@@ -49,15 +59,17 @@ public class ProductDTO {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getUse() {
+		return use;
+	}
 
-    public Double getPrice() {
+	public void setUse(String use) {
+		this.use = use;
+	}
+
+	public Double getPrice() {
         return price;
     }
 
@@ -72,5 +84,38 @@ public class ProductDTO {
     public void setCategory(String category) {
         this.category = category;
     }
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getDelivery() {
+		return delivery;
+	}
+
+	public void setDelivery(String delivery) {
+		this.delivery = delivery;
+	}
+
+	public String getCause() {
+		return cause;
+	}
+
+	public void setCause(String cause) {
+		this.cause = cause;
+	}
+	
 }
 

@@ -1,11 +1,23 @@
 package com.agrikart.agrikartKisan.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 @Entity
-@Table(name = "orders") // "order" is a reserved keyword in SQL, so better use "orders"
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -17,45 +29,50 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // An order can have multiple products (simplified as many-to-many)
-    @ManyToMany
-    @JoinTable(
-        name = "order_products",
-        joinColumns = @JoinColumn(name = "order_id"),
-        inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
+    // ✅ Replaced ManyToMany with OneToMany OrderItems
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<OrderItem> items = new ArrayList<>();
 
     private LocalDateTime orderDate;
 
     private Double totalAmount;
 
-    private String status; // e.g., "PENDING", "COMPLETED", "CANCELLED"
-    private int quantity;
+    private String status; // PENDING, COMPLETED, etc.
     
-    public int getQuantity() {
-		return quantity;
-	}
+    private String productName;
+    
+    private Integer quantity;
+    public Order() {}
+    
+    // ✅ Getter/Setter
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
-	public void setId(Long id) {
+    public Order(Long id, User user, List<OrderItem> items, LocalDateTime orderDate, Double totalAmount, String status,
+			Integer quantity,String productName) {
+		super();
 		this.id = id;
+		this.user = user;
+		this.items = items;
+		this.orderDate = orderDate;
+		this.totalAmount = totalAmount;
+		this.status = status;
+		this.quantity = quantity;
+		this.productName=productName;
+    }
+    
+	public String getProductName() {
+		return productName;
 	}
 
-	// Constructors
-    public Order() {
-        this.orderDate = LocalDateTime.now();
-        this.status = "PENDING";
-    }
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 
-    // Getters and setters
-
-    public Long getId() {
+	public Long getId() {
         return id;
     }
+
+    public void setId(Long id) { this.id = id; }
 
     public User getUser() {
         return user;
@@ -65,12 +82,15 @@ public class Order {
         this.user = user;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+        if (items != null) {
+            items.forEach(i -> i.setOrder(this)); // maintain relationship
+        }
     }
 
     public LocalDateTime getOrderDate() {
@@ -96,4 +116,14 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+    
+    
 }

@@ -6,15 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.agrikart.agrikartKisan.dto.ProductDTO;
 import com.agrikart.agrikartKisan.model.Product;
@@ -37,19 +29,76 @@ public class ProductController {
 
     // ✅ Admin Only: Add Product
     @PostMapping
-    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO,
-                                        @RequestParam String email,
-                                        @RequestParam String password) {
-        User user = userService.loginUser(email, password); // now returns User or null
-        if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
-            Product product = mapToEntity(productDTO);
-            Product savedProduct = productService.saveProduct(product);
-            return ResponseEntity.ok(mapToDTO(savedProduct));
-        } else {
-            return ResponseEntity.status(403).body("Only admin can add products.");
+    public ResponseEntity<?> saveOrUpdateProduct(@Valid @RequestBody ProductDTO productDTO,
+                                                 @RequestParam String email,
+                                                 @RequestParam String password) {
+        User user = userService.loginUser(email, password);
+
+        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).body("Only admin can add or update products.");
         }
+
+        // 🔁 If productDTO has ID, update existing
+        if (productDTO.getId() != null) {
+            Optional<Product> existingOpt = productService.getProductById(productDTO.getId());
+            if (existingOpt.isPresent()) {
+                Product existing = existingOpt.get();
+                existing.setName(productDTO.getName());
+                existing.setCategory(productDTO.getCategory());
+                existing.setPrice(productDTO.getPrice());
+                existing.setDelivery(productDTO.getDelivery());
+                existing.setImageUrl(productDTO.getImageUrl());
+                existing.setUse(productDTO.getUse());
+                existing.setCause(productDTO.getCause());
+                // Don't update product code to avoid duplication errors
+
+                Product updated = productService.saveOrUpdateProduct(existing);
+                return ResponseEntity.ok(mapToDTO(updated));
+            }
+        }
+
+        // 🔁 Otherwise, treat as new product — check for duplicate code
+        if (productService.existsByCode(productDTO.getCode())) {
+            return ResponseEntity.badRequest().body("Product code already exists. Use a unique code.");
+        }
+
+        Product product = mapToEntity(productDTO);
+        Product savedProduct = productService.saveOrUpdateProduct(product);
+
+        return ResponseEntity.ok(mapToDTO(savedProduct));
     }
 
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id,
+                                           @Valid @RequestBody ProductDTO productDTO,
+                                           @RequestParam String email,
+                                           @RequestParam String password) {
+        User user = userService.loginUser(email, password);
+        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).body("Only admin can update products.");
+        }
+
+        Optional<Product> existingOpt = productService.getProductById(id);
+        if (existingOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product existing = existingOpt.get();
+
+        // Update fields
+        existing.setName(productDTO.getName());
+        existing.setCategory(productDTO.getCategory());
+        existing.setPrice(productDTO.getPrice());
+        existing.setDelivery(productDTO.getDelivery());
+        existing.setImageUrl(productDTO.getImageUrl());
+        existing.setUse(productDTO.getUse());
+        existing.setCause(productDTO.getCause());
+        // Don't update code unless you want to
+
+        Product updated = productService.saveOrUpdateProduct(existing);
+        return ResponseEntity.ok(mapToDTO(updated));
+    }
 
     // ✅ Public: Get All Products
     @GetMapping
@@ -61,10 +110,10 @@ public class ProductController {
         return ResponseEntity.ok(dtos);
     }
 
-    // ✅ Public: Get Products by Type
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<ProductDTO>> getProductsByType(@PathVariable String type) {
-        List<Product> products = productService.getProductsByCategory(type);
+    // ✅ Public: Get Products by Category (alias)
+    @GetMapping("/category")
+    public ResponseEntity<List<ProductDTO>> getByCategory(@RequestParam String name) {
+        List<Product> products = productService.getProductsByCategory(name);
         List<ProductDTO> dtos = products.stream()
                                         .map(this::mapToDTO)
                                         .collect(Collectors.toList());
@@ -84,7 +133,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id,
                                            @RequestParam String email,
                                            @RequestParam String password) {
-        User user = userService.loginUser(email, password);  // returns User or null
+        User user = userService.loginUser(email, password);
         if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
             productService.deleteProduct(id);
             return ResponseEntity.ok("Product deleted.");
@@ -93,15 +142,40 @@ public class ProductController {
         }
     }
 
+    // ✅ Admin Only: Bulk Upload Products
+    @PostMapping("/bulk-upload")
+    public ResponseEntity<?> bulkUploadProducts(@RequestBody List<ProductDTO> productDTOs,
+                                                @RequestParam String email,
+                                                @RequestParam String password) {
+        User user = userService.loginUser(email, password);
+        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403).body("Only admin can upload products.");
+        }
 
-    // 🔁 Mapping Helpers
+        List<Product> saved = productDTOs.stream()
+            .map(this::mapToEntity)
+            .map(productService::saveOrUpdateProduct)
+            .toList();
+
+        List<ProductDTO> responseDTOs = saved.stream()
+            .map(this::mapToDTO)
+            .toList();
+
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    // 🔁 Mapping helpers
     private Product mapToEntity(ProductDTO dto) {
         Product product = new Product();
         product.setId(dto.getId());
         product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
+        product.setUse(dto.getUse());
         product.setPrice(dto.getPrice());
         product.setCategory(dto.getCategory());
+        product.setCode(dto.getCode());
+        product.setImageUrl(dto.getImageUrl());
+        product.setCause(dto.getCause());
+        product.setDelivery(dto.getDelivery());
         return product;
     }
 
@@ -109,9 +183,13 @@ public class ProductController {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
-        dto.setDescription(product.getDescription());
+        dto.setUse(product.getUse());
         dto.setPrice(product.getPrice());
         dto.setCategory(product.getCategory());
+        dto.setCode(product.getCode());
+        dto.setImageUrl(product.getImageUrl());
+        dto.setCause(product.getCause());
+        dto.setDelivery(product.getDelivery());
         return dto;
     }
 }

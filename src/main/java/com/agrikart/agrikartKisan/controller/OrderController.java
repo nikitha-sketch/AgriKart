@@ -1,31 +1,25 @@
 package com.agrikart.agrikartKisan.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.agrikart.agrikartKisan.dto.OrderDTO;
+import com.agrikart.agrikartKisan.dto.OrderItemDTO;
 import com.agrikart.agrikartKisan.model.Order;
+import com.agrikart.agrikartKisan.model.OrderItem;
 import com.agrikart.agrikartKisan.model.Product;
 import com.agrikart.agrikartKisan.model.User;
 import com.agrikart.agrikartKisan.repository.ProductRepository;
 import com.agrikart.agrikartKisan.repository.UserRepository;
 import com.agrikart.agrikartKisan.service.OrderService;
 import com.agrikart.agrikartKisan.service.UserService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -37,14 +31,14 @@ public class OrderController {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private ProductRepository productRepository;
 
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Users place orders
+    // ✅ Place Order (User)
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(@Valid @RequestBody OrderDTO orderDto) {
         Optional<User> userOpt = userRepository.findById(orderDto.getUserId());
@@ -52,78 +46,145 @@ public class OrderController {
             return ResponseEntity.badRequest().body("User not found with ID: " + orderDto.getUserId());
         }
 
-        List<Product> products = productRepository.findAllById(orderDto.getProductIds());
-        if (products.isEmpty() || products.size() != orderDto.getProductIds().size()) {
-            return ResponseEntity.badRequest().body("One or more products are invalid");
+        User user = userOpt.get();
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(orderDto.getStatus());
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        double total = 0.0;
+        StringBuilder productNames = new StringBuilder();
+
+        for (OrderItemDTO itemDto : orderDto.getOrderItems()) {
+            Optional<Product> productOpt = productRepository.findById(itemDto.getProductId());
+            if (productOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body("Invalid product ID: " + itemDto.getProductId());
+            }
+
+            Product product = productOpt.get();
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setProduct(product);
+            orderItem.setQuantity(itemDto.getQuantity());
+            orderItem.setProductName(product.getName());
+            orderItem.setProductImage(product.getImageUrl());
+            orderItem.setProductPrice(product.getPrice());
+            orderItem.setProductCode(product.getCode());
+
+            orderItems.add(orderItem);
+            total += product.getPrice() * itemDto.getQuantity();
+
+            if (productNames.length() > 0) productNames.append(", ");
+            productNames.append(product.getName());
         }
 
-        double total = products.stream()
-                .mapToDouble(Product::getPrice)
-                .sum() * orderDto.getQuantity();
-
-        
-
-        Order order = new Order();
-        order.setUser(userOpt.get());
-        order.setProducts(products);
-        order.setQuantity(orderDto.getQuantity());
-        order.setStatus(orderDto.getStatus());
-        order.setOrderDate(LocalDateTime.now());
+        order.setItems(orderItems);
         order.setTotalAmount(total);
+        order.setProductName(productNames.toString());
 
-        return ResponseEntity.ok(orderService.placeOrder(order));
+        Order savedOrder = orderService.placeOrder(order);
+
+        // ✅ Build response DTO
+        List<OrderItemDTO> itemDTOs = savedOrder.getItems().stream().map(item ->
+            new OrderItemDTO(
+                item.getProductName(),
+                item.getProductCode(),
+                item.getProductPrice(),
+                item.getQuantity()
+            )
+        ).toList();
+
+        OrderDTO responseDto = new OrderDTO(
+            savedOrder.getId(),
+            savedOrder.getUser().getFullName(),      // ✅ Only if your constructor accepts this
+            savedOrder.getUser().getId(),
+            itemDTOs,
+            savedOrder.getOrderDate(),
+            savedOrder.getTotalAmount(),
+            savedOrder.getStatus(),
+            savedOrder.getProductName()
+        );
+
+        return ResponseEntity.ok(responseDto);
     }
 
-    // ✅ Admin Only: View all orders
+
+    // ✅ Admin: Get all orders
     @GetMapping("/all")
     public ResponseEntity<?> getAllOrders(@RequestParam String email, @RequestParam String password) {
-        User user = userService.loginUser(email, password); // ✅ use User directly
+        User user = userService.loginUser(email, password);
         if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
-            return ResponseEntity.ok(orderService.getAllOrders());
+            List<OrderDTO> orders = orderService.getAllOrders();
+            return ResponseEntity.ok(orders);
         } else {
             return ResponseEntity.status(403).body("Only admin can view all orders.");
         }
     }
-
 
     // ✅ Public: Get order by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         Optional<Order> orderOpt = orderService.getOrderById(id);
         return orderOpt.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ✅ User: Get orders by user ID
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
+    // ✅ User: Get orders by User ID
+
+    @GetMapping("/by-user")
+    public ResponseEntity<?> getOrdersByUser(@RequestParam Long userId) {
+        List<OrderDTO> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
     }
 
-    // ✅ Admin Only: Delete any order
+
+    // ✅ Admin: Delete order
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id,
                                          @RequestParam String email,
                                          @RequestParam String password) {
-        User user = userService.loginUser(email, password); // ✅ use User directly
+        User user = userService.loginUser(email, password);
         if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
-            orderService.deleteOrder(id);
-            return ResponseEntity.ok("Order deleted successfully.");
+            Optional<Order> orderOpt = orderService.getOrderById(id);
+            if (orderOpt.isPresent()) {
+                orderService.deleteOrder(id);
+                return ResponseEntity.ok("Order deleted successfully.");
+            } else {
+                return ResponseEntity.status(404).body("Order not found.");
+            }
         } else {
             return ResponseEntity.status(403).body("Only admin can delete orders.");
         }
     }
 
+    @DeleteMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrderByUser(@PathVariable Long orderId,
+                                               @RequestParam String email,
+                                               @RequestParam String password) {
+        User user = userService.loginUser(email, password);
+        if (user != null) {
+            boolean success = orderService.cancelOrder(orderId, user.getId());
+            if (success) {
+                return ResponseEntity.ok("Order cancelled successfully.");
+            } else {
+                return ResponseEntity.status(403).body("You can only cancel your own orders.");
+            }
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials.");
+        }
+    }
 
-    // ✅ Admin Only: View default orders (if needed)
+    // ✅ Admin: Get default list of orders
     @GetMapping
-    public ResponseEntity<?> getOrdersDefault(@RequestParam String email, @RequestParam String password) {
-        User user = userService.loginUser(email, password);  // ✅ Use User directly
+    public ResponseEntity<?> getOrdersDefault(@RequestParam String email,
+                                              @RequestParam String password) {
+        User user = userService.loginUser(email, password);
         if (user != null && "ADMIN".equalsIgnoreCase(user.getRole())) {
             return ResponseEntity.ok(orderService.getAllOrders());
         } else {
             return ResponseEntity.status(403).body("Only admin can view all orders.");
         }
     }
-
 }

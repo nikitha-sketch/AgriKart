@@ -15,8 +15,25 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
+    
+    public Product saveOrUpdateProduct(Product product) {
+        Optional<Product> existingProduct = productRepository.findByCode(product.getCode());
+
+        if (existingProduct.isPresent()) {
+            System.out.println("Updating product with code: " + product.getCode());
+            Product existing = existingProduct.get();
+            existing.setName(product.getName());
+            existing.setPrice(product.getPrice());
+            existing.setUse(product.getUse());
+            existing.setImageUrl(product.getImageUrl());
+            existing.setDelivery(product.getDelivery());
+            existing.setCategory(product.getCategory());
+            existing.setCause(product.getCause());
+            return productRepository.save(existing);
+        } else {
+            System.out.println("Creating new product with code: " + product.getCode());
+            return productRepository.save(product);
+        }
     }
 
     public List<Product> getAllProducts() {
@@ -24,11 +41,16 @@ public class ProductService {
     }
 
     public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
+        return productRepository.findByCategoryIgnoreCase(category);
     }
+
 
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
+    }
+
+    public boolean existsByCode(String code) {
+        return productRepository.existsByCode(code);
     }
 
     public void deleteProduct(Long id) {

@@ -40,25 +40,33 @@
         });
 
         if (!response.ok) {
-          // If backend sends 401 or 500
           alert("Invalid email or password");
           return;
         }
 
         const data = await response.json();
-        console.log("Logged in user:", data); // Debug line
+        console.log("Logged in user:", data); // Debug
 
-        if (data.role && data.role.trim().toUpperCase() === "ADMIN") {
-          alert("Admin login successful");
-          window.location.href = "/admin.html";
-        } else if (data.role && data.role.trim().toUpperCase() === "USER"){
-			localStorage.setItem("userId", data.id);  // ✅ INSERT HERE
-			localStorage.setItem("userEmail", data.email); // optional
-          alert("User login successful");
-          window.location.href = "index.html";
-        } else {
-          alert("Login successful but unknown role: " + data.role);
-        }
+        // ✅ Store full user object in localStorage
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          id: data.id,
+          email: data.email,
+          role: data.role,
+          fullName: data.fullName
+        }));
+
+        // Optional individual keys (if you're already using them elsewhere)
+        localStorage.setItem("userId", data.id);
+        localStorage.setItem("userEmail", data.email);
+        localStorage.setItem("loggedIn", "true");
+
+		if (data.role && data.role.trim().toUpperCase() === "USER") {
+		  localStorage.setItem("userId", data.id);
+		  localStorage.setItem("userEmail", data.email);
+		  localStorage.setItem("userPassword", password); // ✅ Add this
+		  alert("User login successful");
+		  window.location.href = "index.html";
+		}
 
       } catch (err) {
         alert("Login failed. Try again.");
@@ -66,6 +74,7 @@
       }
     });
   </script>
+
 
 
 </body>

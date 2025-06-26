@@ -9,22 +9,35 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @Column(unique = true)
+    private String code; 
     private String name;
     private String category;  // Fertilizer, Pesticide, Tool, Seed
-    private String description;
+   // private String description;
     private double price;
+    private String delivery;
     
-    private String imageUrl; // (Optional) if frontend shows image
+    @Column(name = "usage_info")
+    private String use;
+
+    
+    @Column(name = "cause")
+    private String cause;
+
+	private String imageUrl; // (Optional) if frontend shows image
 
     public Product() {}
 
-    public Product(String name, String category, String description, double price, String imageUrl) {
+    public Product(String name, String category, String use, double price,String code,String imageUrl,String delivery,String cause) {
         this.name = name;
         this.category = category;
-        this.description = description;
+        this.use=use;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.code=code;
+        this.delivery=delivery;
+        this.cause=cause;
     }
 
 	public Long getId() {
@@ -51,12 +64,14 @@ public class Product {
 		this.category = category;
 	}
 
-	public String getDescription() {
-		return description;
+	
+
+	public String getUse() {
+		return use;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setUse(String use) {
+		this.use = use;
 	}
 
 	public double getPrice() {
@@ -75,6 +90,28 @@ public class Product {
 		this.imageUrl = imageUrl;
 	}
 
-  
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	public String getDelivery() {
+		return delivery;
+	}
+
+	public void setDelivery(String delivery) {
+		this.delivery = delivery;
+	}
+
+	public String getCause() {
+		return cause;
+	}
+
+	public void setCause(String cause) {
+		this.cause = cause;
+	}
 }
 
