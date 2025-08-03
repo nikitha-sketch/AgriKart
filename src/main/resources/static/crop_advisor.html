@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crop Advisor - AgriKart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 text-green-900">
+
+  <!-- Navbar -->
+  <nav class="bg-green-900 text-white px-4 py-3 flex justify-between items-center">
+    <a href="index.html" class="text-2xl font-bold">AgriKart</a>
+    <ul class="flex items-center space-x-6">
+      <li><a href="index.html" class="hover:underline">Home</a></li>
+      <li class="relative group">
+        <button class="hover:underline focus:outline-none">Products</button>
+        <ul class="absolute hidden group-hover:block bg-white text-green-900 mt-2 rounded shadow-md w-48 z-30">
+          <li><a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a></li>
+          <li><a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a></li>
+          <li><a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a></li>
+          <li><a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a></li>
+        </ul>
+      </li>
+      <li><a href="cart.html" class="hover:underline">Cart</a></li>
+      <li><a href="orders.html" class="hover:underline">My Orders</a></li>
+      <li><a href="help.html" class="hover:underline">Help</a></li>
+    </ul>
+    <button onclick="logout()" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700">Logout</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto p-6 mt-10 bg-white rounded shadow-lg">
+    <h1 class="text-3xl font-bold mb-6 text-center">🌾 AI Crop Advisor</h1>
+
+    <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
+      <div>
+        <label class="block font-medium">Crop Name</label>
+        <input id="mlCrop" class="w-full p-2 border rounded" placeholder="e.g., Tomato" />
+      </div>
+      <div>
+        <label class="block font-medium">Soil Type</label>
+        <input id="mlSoil" class="w-full p-2 border rounded" placeholder="e.g., Loamy" />
+      </div>
+      <div>
+        <label class="block font-medium">Season</label>
+        <input id="mlSeason" class="w-full p-2 border rounded" placeholder="e.g., Summer" />
+      </div>
+      <div>
+        <label class="block font-medium">Region</label>
+        <input id="mlRegion" class="w-full p-2 border rounded" placeholder="e.g., Telangana" />
+      </div>
+    </div>
+
+    <button onclick="predictCropInputs()" class="mt-6 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded font-semibold w-full">
+      🔍 Predict Fertilizer & Pesticide
+    </button>
+
+    <div id="mlResult" class="mt-6 font-semibold hidden">
+      <div class="bg-green-100 border border-green-400 p-4 rounded">
+        <p class="mb-2">🌱 <strong>Recommended Fertilizer:</strong> <span id="mlFertilizer"></span></p>
+        <p class="mb-4">🐛 <strong>Recommended Pesticide:</strong> <span id="mlPesticide"></span></p>
+
+        <div class="flex flex-col md:flex-row gap-4">
+          <a id="fertBuyLink" href="#" target="_blank"
+             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center w-full md:w-1/2">
+            🛒 Buy Fertilizer
+          </a>
+          <a id="pestBuyLink" href="#" target="_blank"
+             class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center w-full md:w-1/2">
+            🐞 Buy Pesticide
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div id="mlError" class="mt-4 text-red-600 font-semibold hidden"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 bg-gray-100 text-sm mt-10">
+    © 2025 AgriKart. All rights reserved.
+  </footer>
+
+  <!-- JS -->
+  <script>
+    function logout() {
+      alert("Logging out...");
+      window.location.href = "login.html";
+    }
+
+    async function predictCropInputs() {
+      const crop = document.getElementById("mlCrop").value.trim();
+      const soil = document.getElementById("mlSoil").value.trim();
+      const season = document.getElementById("mlSeason").value.trim();
+      const region = document.getElementById("mlRegion").value.trim();
+      const errorBox = document.getElementById("mlError");
+      const resultBox = document.getElementById("mlResult");
+
+      errorBox.classList.add("hidden");
+      resultBox.classList.add("hidden");
+
+      if (!crop || !soil || !season || !region) {
+        errorBox.textContent = "❗ Please fill in all fields.";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ crop, soil, season, region })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          errorBox.textContent = data.error || "❌ Prediction failed.";
+          errorBox.classList.remove("hidden");
+        } else {
+          document.getElementById("mlFertilizer").textContent = data.fertilizer;
+          document.getElementById("mlPesticide").textContent = data.pesticide;
+
+          // Redirect to product pages with search
+          document.getElementById("fertBuyLink").href = `fertilizers.html?search=${encodeURIComponent(data.fertilizer)}`;
+          document.getElementById("pestBuyLink").href = `pesticides.html?search=${encodeURIComponent(data.pesticide)}`;
+
+          resultBox.classList.remove("hidden");
+        }
+      } catch (err) {
+        errorBox.textContent = "❌ Unable to connect to the AI server.";
+        errorBox.classList.remove("hidden");
+      }
+    }
+  </script>
+</body>
+</html>

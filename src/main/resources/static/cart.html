@@ -33,18 +33,19 @@
       cart.forEach(item => {
         const div = document.createElement("div");
         div.className = "bg-white p-4 rounded shadow flex flex-col";
+
         div.innerHTML = `
           <img src="${item.image}" alt="${item.name}" class="h-40 object-contain rounded mb-2">
           <h2 class="font-bold text-lg">${item.name}</h2>
-          <p class="text-sm">Code: ${item.code}</p>
-          <p class="text-sm">${item.info}</p>
+          <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${item.code}</span></p>
+          <p class="text-sm"><strong>Use:</strong> ${item.use || 'N/A'}</p>
+          <p class="text-sm"><strong>Cause:</strong> ${item.cause || 'N/A'}</p>
+          <p class="text-sm">Quantity: ${item.quantity}</p>
           <p class="font-bold text-green-700 mt-auto">${item.price}</p>
         `;
         container.appendChild(div);
       });
     }
-    
-    
   </script>
 </body>
 </html>

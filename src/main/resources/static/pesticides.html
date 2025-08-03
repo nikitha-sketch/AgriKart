@@ -4,52 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pesticides - AgriKart</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-.card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-</style>
-
+    .card {
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+  </style>
 </head>
-<body class="bg-green-50 text-gray-900">
-
-<header class="bg-green-700 text-white flex justify-between items-center p-4">
-  <h1 class="text-2xl font-bold">AgriKart - Pesticides</h1>
-  
-  <nav class="flex items-center space-x-6">
-    <a href="index.html" class="hover:underline">Home</a>
-
-    <div class="relative group">
-      <button class="hover:underline focus:outline-none">Products</button>
-      <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
-        <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
-        <a href="pesticides1.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
-        <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
-        <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
+<body class="bg-green-50">
+  <header class="bg-green-700 text-white flex justify-between items-center p-4">
+    <h1 class="text-2xl font-bold">AgriKart - Pesticides</h1>
+    <nav class="flex items-center space-x-6">
+      <a href="index.html" class="hover:underline">Home</a>
+      <div class="relative group">
+        <button class="hover:underline focus:outline-none">Products</button>
+        <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
+          <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
+          <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
+          <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
+          <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
+        </div>
       </div>
-    </div>
+      <input type="text" id="searchInput" placeholder="Search pesticides..." class="p-2 rounded text-black" oninput="renderPesticides()" />
+      <a href="cart.html" class="hover:underline">Cart</a>
+      <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+    </nav>
+  </header>
 
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search pesticides..."
-      class="p-2 rounded text-black"
-      oninput="filterPesticides()"
-    />
-    
-    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-  </nav>
-</header>
-
-  <section id="pesticideGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-    <!-- Cards inserted by JS -->
+  <section id="pesticideContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+    <!-- JS will insert pesticide cards here -->
   </section>
 
   <div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
@@ -57,120 +43,159 @@
   <footer class="text-center py-4 bg-gray-100 text-sm">
     © 2025 AgriKart. All rights reserved.
   </footer>
+
   <script>
     let pesticides = [];
-    let filteredPesticides = [];
-    const itemsPerPage = 4;
+    const perPage = 4;
     let currentPage = 1;
 
     async function loadPesticidesFromBackend() {
       try {
-        //const res = await fetch("http://localhost:8080/api/products?category=Pesticides");
-		const res = await fetch("http://localhost:8080/api/products/category?name=Pesticides");
+        const res = await fetch("http://localhost:8080/api/products/category?name=Pesticides");
         const data = await res.json();
-		pesticides = data.map(p => ({
-		  productId: p.id,
-		  code: p.code,
-		  name: `${p.name} (${p.code})`,
-		  image: p.imageUrl,
-		  
-		  use: p.use || 'No info',
+        pesticides = data.map(p => ({
+          productId: p.id,
+          name: `${p.name} (${p.code})`,
+          plainName: p.name,
+          code: p.code,
+          image: p.imageUrl,
+          use: p.use || 'No info',
+          cause: p.cause || 'Not specified',
+          price: `₹${p.price}`,
+          numericPrice: p.price,
+          delivery: p.delivery || "1-2 days"
+        }));
 
-		  cause: p.cause || "Detailed description not available.",
-		
-		  price: `₹${p.price}`,
-		  delivery: p.delivery && p.delivery.trim() !== "" ? p.delivery : "1-2 days"
-		}));
+		const urlParams = new URLSearchParams(window.location.search);
+		const searchQuery = urlParams.get("search");
+		if (searchQuery) {
+		  document.getElementById("searchInput").value = searchQuery;
+		}
+		renderPesticides();
 
-        filteredPesticides = [...pesticides];
-        displayPesticides();
-      } catch (error) {
-        console.error("Error loading pesticides:", error);
+
+      } catch (err) {
+        console.error("Failed to load pesticides from backend", err);
       }
     }
 
-    function displayPesticides(page = 1) {
-      currentPage = page;
-      const pesticideGrid = document.getElementById('pesticideGrid');
-      pesticideGrid.innerHTML = '';
-      const start = (page - 1) * itemsPerPage;
-      const end = start + itemsPerPage;
-      const pageItems = filteredPesticides.slice(start, end);
+    function renderPredictedOnly(predictedName) {
+      const container = document.getElementById("pesticideContainer");
+      const pagination = document.getElementById("pagination");
+      container.innerHTML = "";
+      pagination.innerHTML = "";
 
-      pageItems.forEach(p => {
-        const smsMessage = `I want to order ${p.name} (Code: ${p.code}) priced at ${p.price}.`;
-        const card = document.createElement('div');
-        card.className = 'bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full';
+      const match = pesticides.find(p => p.plainName.toLowerCase() === predictedName.toLowerCase());
+      if (!match) {
+        container.innerHTML = `<p class="text-red-600 font-semibold col-span-full">No predicted pesticide found: ${predictedName}</p>`;
+        return;
+      }
 
-        card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" class="h-48 w-full object-contain rounded-md mb-3" />
-          <h2 class="text-xl font-semibold">${p.name}</h2>
-          <p class="text-sm mt-1 font-semibold">Product Code: <span class="font-normal">${p.code}</span></p>
-          <p class="text-sm mt-1 font-semibold">Use: <span class="font-normal">${p.use}</span></p>
-          <p class="text-sm mt-1 font-semibold">Cause: <span class="font-normal">${p.cause}</span></p>
-          <p class="text-sm mt-1 font-semibold">Price: <span class="font-normal">${p.price}</span></p>
-          <p class="text-sm mt-1 font-semibold">Delivery: <span class="font-normal">${p.delivery}</span></p>
+      const smsBody = encodeURIComponent(`I want to order ${match.name} (Code: ${match.code})`);
+      const div = document.createElement("div");
+      div.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
+      div.innerHTML = `
+        <img src="${match.image}" alt="${match.name}" class="w-full h-40 object-contain rounded mb-2">
+        <h2 class="text-lg font-bold">${match.name}</h2>
+        <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${match.code}</span></p>
+        <p class="text-sm"><strong>Use:</strong> ${match.use}</p>
+        <p class="text-sm"><strong>Cause:</strong> ${match.cause}</p>
+        <p class="text-green-700 font-bold">${match.price}</p>
+        <p class="text-xs text-gray-500 mb-2">Delivery: ${match.delivery}</p>
 
-          <button onclick='placeOrder(${JSON.stringify(p)})' class="mt-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Place Order
+        <div class="flex flex-col gap-2 mt-auto">
+          <button onclick="placeOrder('${match.productId}', \`${match.name}\`, \`${match.price}\`, \`${match.code}\`, \`${match.image}\`)"
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full">
+            🛒 Place Order
           </button>
-
-          <div class="flex justify-between gap-2 mt-3">
-            <a href="tel:+919876543210" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center w-1/2">
-              Call to Order
+          <div class="flex gap-2">
+            <a href="tel:8019797611" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">
+              📞 Call to Order
             </a>
-            <a href="sms:+919876543210?body=${encodeURIComponent(smsMessage)}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center w-1/2">
-              SMS to Order
+            <a href="sms:8019797611?body=${smsBody}"
+               class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center">
+              ✉️ SMS to Order
             </a>
           </div>
-        `;
-        pesticideGrid.appendChild(card);
-      });
-
-      setupPagination();
+        </div>
+      `;
+      container.appendChild(div);
     }
 
-    function setupPagination() {
-      const pagination = document.getElementById('pagination');
-      pagination.innerHTML = '';
-      const totalPages = Math.ceil(filteredPesticides.length / itemsPerPage);
+    function renderPesticides() {
+      const container = document.getElementById("pesticideContainer");
+      const pagination = document.getElementById("pagination");
+      const query = document.getElementById("searchInput")?.value?.toLowerCase() || "";
+      container.innerHTML = "";
 
+      const filtered = pesticides.filter(p => p.name.toLowerCase().includes(query));
+      const totalPages = Math.ceil(filtered.length / perPage);
+      const start = (currentPage - 1) * perPage;
+      const end = start + perPage;
+
+      filtered.slice(start, end).forEach(p => {
+        const smsBody = encodeURIComponent(`I want to order ${p.name} (Code: ${p.code})`);
+        const div = document.createElement("div");
+        div.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
+        div.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-contain rounded mb-2">
+          <h2 class="text-lg font-bold">${p.name}</h2>
+          <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${p.code}</span></p>
+          <p class="text-sm"><strong>Use:</strong> ${p.use}</p>
+          <p class="text-sm"><strong>Cause:</strong> ${p.cause}</p>
+          <p class="text-green-700 font-bold">${p.price}</p>
+          <p class="text-xs text-gray-500 mb-2">Delivery: ${p.delivery}</p>
+
+          <div class="flex flex-col gap-2 mt-auto">
+            <button onclick="placeOrder('${p.productId}', \`${p.name}\`, \`${p.price}\`, \`${p.code}\`, \`${p.image}\`)"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full">
+              🛒 Place Order
+            </button>
+            <div class="flex gap-2">
+              <a href="tel:8019797611" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">
+                📞 Call to Order
+              </a>
+              <a href="sms:8019797611?body=${smsBody}"
+                 class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center">
+                ✉️ SMS to Order
+              </a>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      pagination.innerHTML = "";
       for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-1 rounded ${i === currentPage ? "bg-green-700 text-white" : "bg-white border"}`;
         btn.textContent = i;
-        btn.className = `px-4 py-2 rounded ${i === currentPage ? 'bg-green-700 text-white' : 'bg-green-300 text-green-900 hover:bg-green-500'}`;
-        btn.onclick = () => displayPesticides(i);
+        btn.onclick = () => {
+          currentPage = i;
+          renderPesticides();
+        };
         pagination.appendChild(btn);
       }
     }
 
-    function filterPesticides() {
-      const query = document.getElementById('searchInput')?.value.toLowerCase() || '';
-      filteredPesticides = pesticides.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.code.toLowerCase().includes(query) ||
-        p.use.toLowerCase().includes(query) ||
-        p.cause.toLowerCase().includes(query)
-      );
-      displayPesticides(1);
-    }
-
-    function placeOrder(item) {
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-      const newItem = {
-        id: item.productId,
-        code: item.code,
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        category: "Pesticides",
-        quantity: 1
-      };
-
-      cart.push(newItem);
+    function placeOrder(productId, name, price, code, image) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(item => item.id === parseInt(productId));
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          id: parseInt(productId),
+          name,
+          price,
+          code,
+          image,
+          category: "Pesticides",
+          quantity: 1
+        });
+      }
       localStorage.setItem("cart", JSON.stringify(cart));
-      alert(`${item.name} added to cart!`);
+      alert(`${name} has been added to your cart.`);
       window.location.href = "cart.html";
     }
 
@@ -179,10 +204,7 @@
       window.location.href = "login.html";
     }
 
-    // Load pesticides on page load
     document.addEventListener("DOMContentLoaded", loadPesticidesFromBackend);
   </script>
-
-
 </body>
 </html>

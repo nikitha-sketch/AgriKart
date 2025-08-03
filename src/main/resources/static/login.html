@@ -45,28 +45,26 @@
         }
 
         const data = await response.json();
-        console.log("Logged in user:", data); // Debug
+        console.log("Logged in user:", data);
 
-        // ✅ Store full user object in localStorage
-        localStorage.setItem("loggedInUser", JSON.stringify({
-          id: data.id,
-          email: data.email,
-          role: data.role,
-          fullName: data.fullName
-        }));
-
-        // Optional individual keys (if you're already using them elsewhere)
+        // Store data
+        localStorage.setItem("loggedInUser", JSON.stringify(data));
         localStorage.setItem("userId", data.id);
         localStorage.setItem("userEmail", data.email);
         localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("userPassword", password);
 
-		if (data.role && data.role.trim().toUpperCase() === "USER") {
-		  localStorage.setItem("userId", data.id);
-		  localStorage.setItem("userEmail", data.email);
-		  localStorage.setItem("userPassword", password); // ✅ Add this
-		  alert("User login successful");
-		  window.location.href = "index.html";
-		}
+        const role = data.role?.trim().toUpperCase();
+
+        if (role === "ADMIN") {
+          alert("Admin login successful");
+          window.location.href = "admin.html";
+        } else if (role === "USER") {
+          alert("User login successful");
+          window.location.href = "index.html";
+        } else {
+          alert("Unknown user role: " + data.role);
+        }
 
       } catch (err) {
         alert("Login failed. Try again.");
@@ -74,8 +72,5 @@
       }
     });
   </script>
-
-
-
 </body>
 </html>

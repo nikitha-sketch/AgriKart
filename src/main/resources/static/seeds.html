@@ -103,28 +103,37 @@
       const card = document.createElement("div");
       card.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
       const smsBody = encodeURIComponent(`I want to order ${s.name} (Code: ${s.code})`);
-      card.innerHTML = `
-        <img src="${s.image}" alt="${s.name}" class="w-full h-48 object-contain rounded mb-2">
-        <h3 class="text-lg font-semibold">${s.name}</h3>
-        <p class="text-sm"><strong>Product Code:</strong> ${s.code}</p>
-        <p class="text-sm"><strong>Use:</strong> ${s.use}</p>
-        <p class="text-sm"><strong>Benefit:</strong> ${s.cause}</p>
-        <p class="text-green-700 font-bold">${s.price}</p>
-        <p class="text-xs text-gray-500 mb-2"><strong>Delivery:</strong> ${s.delivery}</p>
-        <div class="mt-auto flex flex-col gap-2">
-          <button onclick='placeOrder(${JSON.stringify(s)})' class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            🛒 Place Order
-          </button>
-          <div class="flex gap-2">
-            <a href="tel:+918019797611" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-center flex-1">
-              📞 Call to Order
-            </a>
-            <a href="sms:+918019797611?body=${smsBody}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center flex-1">
-              ✉️ SMS to Order
-            </a>
-          </div>
-        </div>
-      `;
+	  const resultDivId = `recommendation-${s.productId}`;  // This line must be ABOVE innerHTML
+
+	  card.innerHTML = `
+	    <img src="${s.image}" alt="${s.name}" class="w-full h-48 object-contain rounded mb-2">
+	    <h3 class="text-lg font-semibold">${s.name}</h3>
+	    <p class="text-sm"><strong>Product Code:</strong> ${s.code}</p>
+	    <p class="text-sm"><strong>Use:</strong> ${s.use}</p>
+	    <p class="text-sm"><strong>Benefit:</strong> ${s.cause}</p>
+	    <p class="text-green-700 font-bold">${s.price}</p>
+	    <p class="text-xs text-gray-500 mb-2"><strong>Delivery:</strong> ${s.delivery}</p>
+	    <div class="mt-auto flex flex-col gap-2">
+	      <button onclick='placeOrder(${JSON.stringify(s)})' class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+	        🛒 Place Order
+	      </button>
+
+		  <button onclick="getRecommendation('${s.name.split('(')[0].trim()}', '${resultDivId}')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+	        🌾 Get Recommendation
+	      </button>
+	      <div id="${resultDivId}" class="bg-purple-50 mt-2 p-2 rounded text-sm hidden"></div>
+
+	      <div class="flex gap-2">
+	        <a href="tel:+918019797611" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-center flex-1">
+	          📞 Call to Order
+	        </a>
+	        <a href="sms:+918019797611?body=${smsBody}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded text-center flex-1">
+	          ✉️ SMS to Order
+	        </a>
+	      </div>
+	    </div>
+	  `;
+
       seedGrid.appendChild(card);
     });
 
@@ -139,6 +148,37 @@
         renderSeeds();
       };
       pagination.appendChild(btn);
+    }
+  }
+
+  async function getRecommendation(cropName, resultDivId) {
+    const resultDiv = document.getElementById(resultDivId);
+    resultDiv.innerHTML = "";
+    resultDiv.classList.add("hidden");
+
+    try {
+      const res = await fetch("http://127.0.0.1:5000/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ crop: cropName })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        resultDiv.innerHTML = `
+          <p><strong>✅ Crop:</strong> ${data.crop}</p>
+          <p>🌱 <strong>Fertilizer:</strong> ${data.fertilizer}</p>
+          <p>🐛 <strong>Pesticide:</strong> ${data.pesticide}</p>
+        `;
+      } else {
+        resultDiv.innerHTML = `<p class="text-red-600">❌ ${data.error || "Crop not found."}</p>`;
+      }
+
+      resultDiv.classList.remove("hidden");
+    } catch (err) {
+      resultDiv.innerHTML = `<p class="text-red-600">⚠️ Could not connect to recommendation service.</p>`;
+      resultDiv.classList.remove("hidden");
     }
   }
 

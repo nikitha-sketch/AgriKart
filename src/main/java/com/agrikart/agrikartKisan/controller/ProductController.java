@@ -1,12 +1,28 @@
 package com.agrikart.agrikartKisan.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.agrikart.agrikartKisan.dto.ProductDTO;
 import com.agrikart.agrikartKisan.model.Product;
@@ -53,6 +69,7 @@ public class ProductController {
                 // Don't update product code to avoid duplication errors
 
                 Product updated = productService.saveOrUpdateProduct(existing);
+                notifyFlaskRecommendation(productDTO);
                 return ResponseEntity.ok(mapToDTO(updated));
             }
         }
@@ -64,7 +81,7 @@ public class ProductController {
 
         Product product = mapToEntity(productDTO);
         Product savedProduct = productService.saveOrUpdateProduct(product);
-
+        notifyFlaskRecommendation(productDTO);
         return ResponseEntity.ok(mapToDTO(savedProduct));
     }
 
@@ -97,6 +114,7 @@ public class ProductController {
         // Don't update code unless you want to
 
         Product updated = productService.saveOrUpdateProduct(existing);
+        notifyFlaskRecommendation(productDTO);
         return ResponseEntity.ok(mapToDTO(updated));
     }
 
@@ -192,4 +210,53 @@ public class ProductController {
         dto.setDelivery(product.getDelivery());
         return dto;
     }
+    
+    private void notifyFlaskRecommendation(ProductDTO dto) {
+        if (!"Seeds".equalsIgnoreCase(dto.getCategory())) return;
+
+        try {
+            String flaskRecommendUrl = "http://127.0.0.1:5000/recommend";
+            String flaskAddCropUrl = "http://127.0.0.1:5000/add-crop";
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            Map<String, String> cropRequest = new HashMap<>();
+            cropRequest.put("crop", dto.getName());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> recommendRequest = new HttpEntity<>(cropRequest, headers);
+
+            // 🔍 First try to get existing recommendation
+            String fertilizer = dto.getUse() != null ? dto.getUse() : "General Fertilizer";
+            String pesticide = dto.getCause() != null ? dto.getCause() : "General Pesticide";
+
+            try {
+                ResponseEntity<Map> response = restTemplate.exchange(flaskRecommendUrl, HttpMethod.POST, recommendRequest, Map.class);
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    Map<String, String> body = response.getBody();
+                    fertilizer = body.getOrDefault("fertilizer", fertilizer);
+                    pesticide = body.getOrDefault("pesticide", pesticide);
+                }
+            } catch (Exception ignored) {
+                // Crop not found — proceed with what we have
+            }
+
+            // ✅ Always try to save it in CSV
+            Map<String, String> addPayload = new HashMap<>();
+            addPayload.put("crop", dto.getName());
+            addPayload.put("fertilizer", fertilizer);
+            addPayload.put("pesticide", pesticide);
+
+            HttpEntity<Map<String, String>> saveRequest = new HttpEntity<>(addPayload, headers);
+            restTemplate.exchange(flaskAddCropUrl, HttpMethod.POST, saveRequest, String.class);
+
+        } catch (Exception e) {
+            System.err.println("❌ Failed to send crop to Flask: " + e.getMessage());
+        }
+    }
+
+
+
+
 }

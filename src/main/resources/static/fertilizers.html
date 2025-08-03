@@ -16,160 +16,165 @@
 </head>
 <body class="bg-green-50">
   <header class="bg-green-700 text-white flex justify-between items-center p-4">
-  <h1 class="text-2xl font-bold">AgriKart - Fertilizers</h1>
-  
-  <nav class="flex items-center space-x-6">
-    <a href="index.html" class="hover:underline">Home</a>
-
-    <div class="relative group">
-      <button class="hover:underline focus:outline-none">Products</button>
-      <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
-        <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
-        <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
-        <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
-        <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
-      </div>
-    </div>
-
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search fertilizers..."
-      class="p-2 rounded text-black"
-      oninput="renderFertilizers()"
-    />
-    <a href="cart.html" class="hover:underline">Cart</a>
-    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-  </nav>
-</header>
-
-<section id="fertilizerContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-  <!-- Cards inserted by JS -->
-</section>
-
-<div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
-
-<footer class="text-center py-4 bg-gray-100 text-sm">
-  © 2025 AgriKart. All rights reserved.
-</footer>
-<script>
-  let fertilizers = [];
-  const perPage = 4;
-  let currentPage = 1;
-
-  async function loadFertilizersFromBackend() {
-    try {
-      const res = await fetch("http://localhost:8080/api/products/category?name=Fertilizers");
-      const data = await res.json();
-      fertilizers = data.map(p => ({
-        productId: p.id,
-        name: `${p.name} (${p.code})`,
-        code: p.code,
-        image: p.imageUrl,
-        use: p.use,
-        cause: p.cause,
-        price: `₹${p.price}`,
-        delivery: p.delivery || "2-5 days"
-      }));
-      renderFertilizers();
-    } catch (err) {
-      console.error("Failed to load fertilizers from backend", err);
-    }
-  }
-
-  function renderFertilizers() {
-    const container = document.getElementById("fertilizerContainer");
-    const pagination = document.getElementById("pagination");
-    const query = document.getElementById("searchInput")?.value?.toLowerCase() || "";
-    container.innerHTML = "";
-
-    const filtered = fertilizers.filter(f => f.name.toLowerCase().includes(query));
-    const totalPages = Math.ceil(filtered.length / perPage);
-
-    const start = (currentPage - 1) * perPage;
-    const end = start + perPage;
-
-    filtered.slice(start, end).forEach((f, i) => {
-      const div = document.createElement("div");
-      div.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
-
-      const smsBody = encodeURIComponent(`I want to order ${f.name} (Code: ${f.code})`);
-
-      div.innerHTML = `
-        <img src="${f.image}" alt="${f.name}" class="w-full h-40 object-contain rounded mb-2">
-        <h2 class="text-lg font-bold">${f.name}</h2>
-        <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${f.code}</span></p>
-		<p class="text-sm"><strong>Use:</strong> ${f.use}</p>
-		<p class="text-sm"><strong>Cause:</strong> ${f.cause}</p>
-
-        <p class="text-green-700 font-bold">${f.price}</p>
-        <p class="text-xs text-gray-500 mb-2">Delivery: ${f.delivery}</p>
-
-        <div class="flex flex-col gap-2 mt-auto">
-          <button onclick="placeOrder('${f.productId}', \`${f.name}\`, \`${f.price}\`, \`${f.code}\`, \`${f.image}\`)"
-                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full">
-            🛒 Place Order
-          </button>
-
-          <div class="flex gap-2">
-            <a href="tel:8019797611" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">
-              📞 Call to Order
-            </a>
-            <a href="sms:8019797611?body=${smsBody}"
-               class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center">
-              ✉️ SMS to Order
-            </a>
-          </div>
+    <h1 class="text-2xl font-bold">AgriKart - Fertilizers</h1>
+    <nav class="flex items-center space-x-6">
+      <a href="index.html" class="hover:underline">Home</a>
+      <div class="relative group">
+        <button class="hover:underline focus:outline-none">Products</button>
+        <div class="absolute left-0 bg-white text-black mt-2 rounded shadow-lg hidden group-hover:flex flex-col z-10">
+          <a href="fertilizers.html" class="block px-4 py-2 hover:bg-green-100">Fertilizers</a>
+          <a href="pesticides.html" class="block px-4 py-2 hover:bg-green-100">Pesticides</a>
+          <a href="seeds.html" class="block px-4 py-2 hover:bg-green-100">Seeds</a>
+          <a href="tools.html" class="block px-4 py-2 hover:bg-green-100">Tools</a>
         </div>
-      `;
-      container.appendChild(div);
-    });
+      </div>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search fertilizers..."
+        class="p-2 rounded text-black"
+        oninput="renderFertilizers()"
+      />
+      <a href="cart.html" class="hover:underline">Cart</a>
+      <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+    </nav>
+  </header>
 
-    pagination.innerHTML = "";
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.className = `px-3 py-1 rounded ${i === currentPage ? "bg-green-700 text-white" : "bg-white border"}`;
-      btn.textContent = i;
-      btn.onclick = () => {
-        currentPage = i;
+  <!-- All Fertilizer Cards -->
+  <section id="fertilizerContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
+    <!-- Cards inserted by JS -->
+  </section>
+
+  <div class="flex justify-center space-x-3 mb-10" id="pagination"></div>
+
+  <footer class="text-center py-4 bg-gray-100 text-sm">
+    © 2025 AgriKart. All rights reserved.
+  </footer>
+
+  <script>
+    let fertilizers = [];
+    const perPage = 4;
+    let currentPage = 1;
+
+    async function loadFertilizersFromBackend() {
+      try {
+        const res = await fetch("http://localhost:8080/api/products/category?name=Fertilizers");
+        const data = await res.json();
+        fertilizers = data.map(p => ({
+          productId: p.id,
+          name: `${p.name} (${p.code})`,
+          code: p.code,
+          image: p.imageUrl,
+          use: p.use || "No info",
+          cause: p.cause || "No cause info",
+          price: `₹${p.price}`,
+          delivery: p.delivery || "2-5 days"
+        }));
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get("search");
+        if (searchQuery) {
+          document.getElementById("searchInput").value = searchQuery;
+        }
+
         renderFertilizers();
-      };
-      pagination.appendChild(btn);
+      } catch (err) {
+        console.error("Failed to load fertilizers from backend", err);
+      }
     }
-  }
 
-  function placeOrder(productId, name, price, code, image) {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    function renderFertilizers() {
+      const container = document.getElementById("fertilizerContainer");
+      const pagination = document.getElementById("pagination");
+      const query = document.getElementById("searchInput")?.value?.toLowerCase() || "";
+      container.innerHTML = "";
 
-    const existing = cart.find(item => item.id === parseInt(productId));
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({
-        id: parseInt(productId),
-        name,
-        price,
-        code,
-        image,
-        category: "Fertilizers",
-        quantity: 1
+      const filtered = fertilizers.filter(f => f.name.toLowerCase().includes(query));
+      const totalPages = Math.ceil(filtered.length / perPage);
+
+      const start = (currentPage - 1) * perPage;
+      const end = start + perPage;
+
+      filtered.slice(start, end).forEach(f => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-4 rounded-lg shadow card flex flex-col justify-between h-full";
+
+        const smsBody = encodeURIComponent(`I want to order ${f.name} (Code: ${f.code})`);
+
+        div.innerHTML = `
+          <img src="${f.image}" alt="${f.name}" class="w-full h-40 object-contain rounded mb-2">
+          <h2 class="text-lg font-bold">${f.name}</h2>
+          <p class="text-sm text-gray-600 mb-1">Product Code: <span class="font-mono text-black">${f.code}</span></p>
+          <p class="text-sm"><strong>Use:</strong> ${f.use}</p>
+          <p class="text-sm"><strong>Cause:</strong> ${f.cause}</p>
+          <p class="text-green-700 font-bold">${f.price}</p>
+          <p class="text-xs text-gray-500 mb-2">Delivery: ${f.delivery}</p>
+
+          <div class="flex flex-col gap-2 mt-auto">
+			<button onclick="placeOrder('${f.productId}', \`${f.name}\`, \`${f.price}\`, \`${f.code}\`, \`${f.image}\`, \`${f.use}\`, \`${f.cause}\`)"
+			        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full">
+			  🛒 Place Order
+			</button>
+
+            <div class="flex gap-2">
+              <a href="tel:8019797611" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">
+                📞 Call to Order
+              </a>
+              <a href="sms:8019797611?body=${smsBody}"
+                 class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-center">
+                ✉️ SMS to Order
+              </a>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
       });
+
+      pagination.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-1 rounded ${i === currentPage ? "bg-green-700 text-white" : "bg-white border"}`;
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          renderFertilizers();
+        };
+        pagination.appendChild(btn);
+      }
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${name} has been added to your cart.`);
-    window.location.href = "cart.html";
-  }
+	function placeOrder(productId, name, price, code, image, use, cause) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(item => item.id === parseInt(productId));
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+		cart.push({
+		  id: parseInt(productId),
+		  name,
+		  price,
+		  code,
+		  image,
+		  category: "Fertilizers",
+		  quantity: 1,
+		  use,
+		  cause
+		});
 
-  function logout() {
-    alert("Logging out...");
-    window.location.href = "login.html";
-  }
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`${name} has been added to your cart.`);
+      window.location.href = "cart.html";
+    }
 
-  document.addEventListener("DOMContentLoaded", loadFertilizersFromBackend);
-</script>
+    function logout() {
+      alert("Logging out...");
+      window.location.href = "login.html";
+    }
 
-
-
+    document.addEventListener("DOMContentLoaded", () => {
+      loadFertilizersFromBackend();
+    });
+  </script>
 </body>
 </html>

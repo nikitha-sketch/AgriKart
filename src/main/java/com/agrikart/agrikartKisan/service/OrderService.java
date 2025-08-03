@@ -44,9 +44,11 @@ public class OrderService {
             }
         }
 
-        order.setQuantity(totalQuantity); // ✅ Set total quantity
+        order.setQuantity(totalQuantity);        // ✅ Set total quantity
+        order.setStatus("Confirmed");            // ✅ Set default status
         return orderRepository.save(order);
     }
+
 
  // OrderService.java
 
