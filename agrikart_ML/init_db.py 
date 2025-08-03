@@ -1,0 +1,25 @@
+import sqlite3
+
+conn = sqlite3.connect('recommendation.db')
+cursor = conn.cursor()
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS recommendations (
+        crop TEXT PRIMARY KEY,
+        fertilizer TEXT,
+        pesticide TEXT
+    )
+''')
+
+cursor.executemany('''
+    INSERT OR IGNORE INTO recommendations (crop, fertilizer, pesticide)
+    VALUES (?, ?, ?)
+''', [
+    ("Tomato", "NPK 12-6-6", "Imidacloprid"),
+    ("Rice", "DAP", "Carbendazim"),
+    ("Wheat", "Urea", "Chlorpyrifos")
+])
+
+conn.commit()
+conn.close()
+print("✅ recommendation.db initialized.")

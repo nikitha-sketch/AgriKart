@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crop Recommendation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 flex flex-col items-center justify-center min-h-screen p-4">
+
+  <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-green-800 text-center">🌾 Crop Recommendation</h1>
+
+    <label class="block mb-2 text-sm font-medium text-gray-700">Enter Crop Name:</label>
+    <input id="cropInput" type="text" placeholder="e.g., Cotton, Tomato" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-green-500"/>
+
+    <button onclick="getRecommendation()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+      Get Recommendation
+    </button>
+
+    <div id="result" class="mt-6 hidden bg-green-100 p-4 rounded">
+      <p class="text-green-900 font-semibold" id="cropName"></p>
+      <p>🌱 <strong>Fertilizer:</strong> <span id="fertilizer"></span></p>
+      <p>🐛 <strong>Pesticide:</strong> <span id="pesticide"></span></p>
+    </div>
+
+    <div id="error" class="mt-6 hidden text-red-600 font-semibold text-center"></div>
+  </div>
+
+  <script>
+    async function getRecommendation() {
+      const crop = document.getElementById("cropInput").value.trim();
+      const resultBox = document.getElementById("result");
+      const errorBox = document.getElementById("error");
+
+      resultBox.classList.add("hidden");
+      errorBox.classList.add("hidden");
+
+      if (!crop) {
+        errorBox.textContent = "Please enter a crop name.";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ crop })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorBox.textContent = data.error || "Something went wrong.";
+          errorBox.classList.remove("hidden");
+        } else {
+          document.getElementById("cropName").textContent = `✅ Crop: ${data.crop}`;
+          document.getElementById("fertilizer").textContent = data.fertilizer;
+          document.getElementById("pesticide").textContent = data.pesticide;
+          resultBox.classList.remove("hidden");
+        }
+      } catch (err) {
+        errorBox.textContent = "⚠️ Unable to connect to backend.";
+        errorBox.classList.remove("hidden");
+      }
+    }
+  </script>
+
+</body>
+</html>

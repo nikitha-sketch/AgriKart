@@ -1,0 +1,245 @@
+[
+  {
+    "id": "potassium_nitrate",
+    "type": "fertilizer",
+    "name": "Potassium Nitrate",
+    "price": 850,
+    "image": "images/fertilizers/potassium_nitrate.jpg",
+    "description": "Potassium Nitrate is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "calcium_nitrate",
+    "type": "fertilizer",
+    "name": "Calcium Nitrate",
+    "price": 850,
+    "image": "images/fertilizers/calcium_nitrate.jpg",
+    "description": "Calcium Nitrate is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "urea",
+    "type": "fertilizer",
+    "name": "Urea",
+    "price": 850,
+    "image": "images/fertilizers/urea.jpg",
+    "description": "Urea is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "npk_20-20-20",
+    "type": "fertilizer",
+    "name": "NPK 20-20-20",
+    "price": 850,
+    "image": "images/fertilizers/npk_20-20-20.jpg",
+    "description": "NPK 20-20-20 is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "dap",
+    "type": "fertilizer",
+    "name": "DAP",
+    "price": 850,
+    "image": "images/fertilizers/dap.jpg",
+    "description": "DAP is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "humic_acid",
+    "type": "fertilizer",
+    "name": "Humic Acid",
+    "price": 850,
+    "image": "images/fertilizers/humic_acid.jpg",
+    "description": "Humic Acid is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "zinc_sulphate",
+    "type": "fertilizer",
+    "name": "Zinc Sulphate",
+    "price": 850,
+    "image": "images/fertilizers/zinc_sulphate.jpg",
+    "description": "Zinc Sulphate is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "silicon_fertilizer",
+    "type": "fertilizer",
+    "name": "Silicon Fertilizer",
+    "price": 850,
+    "image": "images/fertilizers/silicon_fertilizer.jpg",
+    "description": "Silicon Fertilizer is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "rock_phosphate",
+    "type": "fertilizer",
+    "name": "Rock Phosphate",
+    "price": 850,
+    "image": "images/fertilizers/rock_phosphate.jpg",
+    "description": "Rock Phosphate is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "ammonium_sulphate",
+    "type": "fertilizer",
+    "name": "Ammonium Sulphate",
+    "price": 850,
+    "image": "images/fertilizers/ammonium_sulphate.jpg",
+    "description": "Ammonium Sulphate is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "liquid_organic_fertilizer",
+    "type": "fertilizer",
+    "name": "Liquid Organic Fertilizer",
+    "price": 850,
+    "image": "images/fertilizers/liquid_organic_fertilizer.jpg",
+    "description": "Liquid Organic Fertilizer is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "phosphoric_acid",
+    "type": "fertilizer",
+    "name": "Phosphoric Acid",
+    "price": 850,
+    "image": "images/fertilizers/phosphoric_acid.jpg",
+    "description": "Phosphoric Acid is a fertilizer recommended for crop productivity.",
+    "available": true
+  },
+  {
+    "id": "terminator_xt",
+    "type": "pesticide",
+    "name": "Terminator XT",
+    "price": 750,
+    "image": "images/pesticides/terminator_xt.jpg",
+    "description": "Terminator XT is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "fungicide_pro",
+    "type": "pesticide",
+    "name": "Fungicide Pro",
+    "price": 750,
+    "image": "images/pesticides/fungicide_pro.jpg",
+    "description": "Fungicide Pro is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "leafshield",
+    "type": "pesticide",
+    "name": "LeafShield",
+    "price": 750,
+    "image": "images/pesticides/leafshield.jpg",
+    "description": "LeafShield is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "mitex",
+    "type": "pesticide",
+    "name": "Mitex",
+    "price": 750,
+    "image": "images/pesticides/mitex.jpg",
+    "description": "Mitex is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "greenspray",
+    "type": "pesticide",
+    "name": "GreenSpray",
+    "price": 750,
+    "image": "images/pesticides/greenspray.jpg",
+    "description": "GreenSpray is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "organic_guard",
+    "type": "pesticide",
+    "name": "Organic Guard",
+    "price": 750,
+    "image": "images/pesticides/organic_guard.jpg",
+    "description": "Organic Guard is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "bayer_confidor",
+    "type": "pesticide",
+    "name": "Bayer Confidor",
+    "price": 750,
+    "image": "images/pesticides/bayer_confidor.jpg",
+    "description": "Bayer Confidor is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "insectoshield",
+    "type": "pesticide",
+    "name": "InsectoShield",
+    "price": 750,
+    "image": "images/pesticides/insectoshield.jpg",
+    "description": "InsectoShield is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "safeguard",
+    "type": "pesticide",
+    "name": "SafeGuard",
+    "price": 750,
+    "image": "images/pesticides/safeguard.jpg",
+    "description": "SafeGuard is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "cropcare_plus",
+    "type": "pesticide",
+    "name": "CropCare Plus",
+    "price": 750,
+    "image": "images/pesticides/cropcare_plus.jpg",
+    "description": "CropCare Plus is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "bioneem_spray",
+    "type": "pesticide",
+    "name": "Bioneem Spray",
+    "price": 750,
+    "image": "images/pesticides/bioneem_spray.jpg",
+    "description": "Bioneem Spray is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "dicofol",
+    "type": "pesticide",
+    "name": "Dicofol",
+    "price": 750,
+    "image": "images/pesticides/dicofol.jpg",
+    "description": "Dicofol is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "ecohume",
+    "type": "pesticide",
+    "name": "EcoHume",
+    "price": 750,
+    "image": "images/pesticides/ecohume.jpg",
+    "description": "EcoHume is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "powerneem",
+    "type": "pesticide",
+    "name": "PowerNeem",
+    "price": 750,
+    "image": "images/pesticides/powerneem.jpg",
+    "description": "PowerNeem is a pesticide commonly used for crop protection.",
+    "available": true
+  },
+  {
+    "id": "weedex",
+    "type": "pesticide",
+    "name": "WeedEx",
+    "price": 750,
+    "image": "images/pesticides/weedex.jpg",
+    "description": "WeedEx is a pesticide commonly used for crop protection.",
+    "available": true
+  }
+]
